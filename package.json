@@ -13,5 +13,9 @@
     "build:api": "corepack enable && yarn install && yarn workspace @warehouse/api build",
     "dev:api": "corepack enable && yarn install && yarn workspace @warehouse/api dev",
     "start:api": "corepack enable && yarn workspace @warehouse/api start"
+  },
+  "engines": {
+    "node": "22.16.0",
+    "yarn": "4.10.3"
   }
 }
