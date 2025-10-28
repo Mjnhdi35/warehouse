@@ -5,5 +5,13 @@
   "workspaces": [
     "packages/*",
     "apps/*"
-  ]
+  ],
+  "scripts": {
+    "build:web": "corepack enable && yarn install && yarn workspace @warehouse/web build",
+    "dev:web": "corepack enable && yarn install && yarn workspace @warehouse/web dev",
+    "start:web": "corepack enable && yarn workspace @warehouse/web start",
+    "build:api": "corepack enable && yarn install && yarn workspace @warehouse/api build",
+    "dev:api": "corepack enable && yarn install && yarn workspace @warehouse/api dev",
+    "start:api": "corepack enable && yarn workspace @warehouse/api start"
+  }
 }

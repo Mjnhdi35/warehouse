@@ -4017,6 +4017,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@warehouse/web@workspace:apps/web":
+  version: 0.0.0-use.local
+  resolution: "@warehouse/web@workspace:apps/web"
+  dependencies:
+    nuxt: "npm:^4.2.0"
+    vue: "npm:^3.5.22"
+    vue-router: "npm:^4.6.3"
+  languageName: unknown
+  linkType: soft
+
 "@webassemblyjs/ast@npm:1.14.1, @webassemblyjs/ast@npm:^1.14.1":
   version: 1.14.1
   resolution: "@webassemblyjs/ast@npm:1.14.1"
@@ -12705,16 +12715,6 @@ __metadata:
   checksum: 10c0/5b61ca583a95e2dd85d7078400190efd452e05751a64accb8c06ce4db65d7e0b0cde9917d705e826a2e05cc2548f61efde115ffa374c3e436d04be45c889e5b4
   languageName: node
   linkType: hard
-
-"web@workspace:apps/web":
-  version: 0.0.0-use.local
-  resolution: "web@workspace:apps/web"
-  dependencies:
-    nuxt: "npm:^4.2.0"
-    vue: "npm:^3.5.22"
-    vue-router: "npm:^4.6.3"
-  languageName: unknown
-  linkType: soft
 
 "webidl-conversions@npm:^3.0.0":
   version: 3.0.1
