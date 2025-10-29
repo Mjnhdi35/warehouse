@@ -9,11 +9,11 @@ services:
         value: production
     healthCheckPath: /
     buildCommand: |
-      corepack enable || true
-      corepack prepare yarn@4.10.3 --activate || true
-      yarn install --immutable
-      yarn --cwd apps/api build
-    startCommand: yarn --cwd apps/api start:prod
+      corepack enable || true &&
+      corepack prepare yarn@4.10.3 --activate || true && 
+      yarn install --immutable &&
+      yarn workspace @warehouse/api build
+    startCommand: yarn workspace @warehouse/api start:prod
 
   - type: web
     name: warehouse-web
@@ -25,8 +25,8 @@ services:
         value: production
     healthCheckPath: /
     buildCommand: |
-      corepack enable || true
-      corepack prepare yarn@4.10.3 --activate || true
-      yarn install --immutable
-      yarn --cwd apps/web build
-    startCommand: yarn --cwd apps/web start
+      corepack enable || true && 
+      corepack prepare yarn@4.10.3 --activate || true && 
+      yarn install --immutable && 
+      yarn workspace @warehouse/web build
+    startCommand: yarn workspace @warehouse/web start
