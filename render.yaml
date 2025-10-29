@@ -7,7 +7,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-    healthCheckPath: /
+    healthCheckPath: /api
     buildCommand: |
       corepack enable || true &&
       corepack prepare yarn@4.10.3 --activate || true && 
