@@ -12,11 +12,7 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "tsc": "yarn nx run-many -t tsc",
     "lint": "yarn nx run-many -t lint",
-    "build": "yarn nx run-many -t build",
-    "build:api": "yarn nx build api",
-    "start:api": "yarn nx start:prod api",
-    "build:web": "yarn nx build web",
-    "start:web": "yarn nx start web"
+    "build": "yarn nx run-many -t build"
   },
   "engines": {
     "node": "22.16.0",

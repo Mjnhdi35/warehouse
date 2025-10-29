@@ -1,22 +1,24 @@
 services:
   - type: web
     name: warehouse-api
-    env: node
+    runtime: node
     plan: free
     rootDir: .
     buildCommand: >
       corepack enable && corepack prepare yarn@4.10.3 --activate &&
       yarn install --immutable &&
       yarn nx build api
-    startCommand: node apps/api/dist/main.js
+    startCommand: >
+      yarn nx start:prod api
 
   - type: web
     name: warehouse-web
-    env: node
+    runtime: node
     plan: free
     rootDir: .
     buildCommand: >
       corepack enable && corepack prepare yarn@4.10.3 --activate &&
       yarn install --immutable &&
       yarn nx build web
-    startCommand: node apps/web/.output/server/index.mjs
+    startCommand: >
+      yarn nx start web
