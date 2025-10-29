@@ -13,7 +13,7 @@ services:
       corepack prepare yarn@4.10.3 --activate || true
       yarn install --immutable
       yarn --cwd apps/api build
-    startCommand: NODE_ENV=production NODE_OPTIONS=--max-old-space-size=384 node apps/api/dist/main.js
+    startCommand: yarn --cwd apps/api start:prod
 
   - type: web
     name: warehouse-web
@@ -28,5 +28,5 @@ services:
       corepack enable || true
       corepack prepare yarn@4.10.3 --activate || true
       yarn install --immutable
-      yarn nx build web
-    startCommand: NODE_ENV=production NODE_OPTIONS=--max-old-space-size=384 node apps/web/.output/server/index.mjs
+      yarn --cwd apps/web build
+    startCommand: yarn --cwd apps/web start
