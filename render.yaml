@@ -9,9 +9,8 @@ services:
         value: production
     healthCheckPath: /
     buildCommand: >
-      corepack enable && corepack prepare yarn@4.10.3 --activate &&
-      yarn install --immutable &&
-      yarn --cwd apps/api build
+      node .yarn/releases/yarn-4.10.3.cjs install --immutable &&
+      node .yarn/releases/yarn-4.10.3.cjs --cwd apps/api build
     startCommand: NODE_ENV=production NODE_OPTIONS=--max-old-space-size=384 node apps/api/dist/main.js
 
   - type: web
@@ -24,7 +23,6 @@ services:
         value: production
     healthCheckPath: /
     buildCommand: >
-      corepack enable && corepack prepare yarn@4.10.3 --activate &&
-      yarn install --immutable &&
-      yarn nx build web
+      node .yarn/releases/yarn-4.10.3.cjs install --immutable &&
+      node .yarn/releases/yarn-4.10.3.cjs nx build web
     startCommand: NODE_ENV=production NODE_OPTIONS=--max-old-space-size=384 node apps/web/.output/server/index.mjs

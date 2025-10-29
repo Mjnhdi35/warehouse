@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: warehouse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: warehouse_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - warehouse-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: warehouse-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - warehouse-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  warehouse-network:
+    driver: bridge

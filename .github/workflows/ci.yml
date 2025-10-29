@@ -13,6 +13,8 @@ concurrency:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    env:
+      YARN_IGNORE_PATH: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,13 +43,13 @@ jobs:
             nx-${{ runner.os }}-
 
       - name: Install
-        run: yarn install --immutable
+        run: corepack yarn install --immutable
 
       - name: Lint (root script)
-        run: yarn lint
+        run: corepack yarn lint
 
       - name: Typecheck (root script)
-        run: yarn tsc
+        run: corepack yarn tsc
 
       - name: Build (root script)
-        run: yarn build
+        run: corepack yarn build
