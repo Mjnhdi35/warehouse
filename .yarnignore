@@ -1,0 +1,15 @@
+# Reduce Yarn cache size & install time (Yarn 4)
+# Common junk and build artifacts
+**/node_modules/
+**/.nuxt/
+**/dist/
+**/coverage/
+**/*.log
+**/*.map
+**/test/**
+**/__tests__/**
+**/.env*
+
+# VCS & local caches
+.git/
+.nx/cache/

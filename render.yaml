@@ -4,21 +4,27 @@ services:
     runtime: node
     plan: free
     rootDir: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
     buildCommand: >
       corepack enable && corepack prepare yarn@4.10.3 --activate &&
       yarn install --immutable &&
-      yarn nx build api
-    startCommand: >
-      yarn nx start api
+      yarn --cwd apps/api build
+    startCommand: NODE_ENV=production NODE_OPTIONS=--max-old-space-size=384 node apps/api/dist/main.js
 
   - type: web
     name: warehouse-web
     runtime: node
     plan: free
     rootDir: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
     buildCommand: >
       corepack enable && corepack prepare yarn@4.10.3 --activate &&
       yarn install --immutable &&
       yarn nx build web
-    startCommand: >
-      yarn nx start web
+    startCommand: NODE_ENV=production NODE_OPTIONS=--max-old-space-size=384 node apps/web/.output/server/index.mjs

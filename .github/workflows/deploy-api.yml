@@ -1,0 +1,21 @@
+name: Deploy API (Render)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'nx.json'
+      - 'render.yaml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render API deploy
+        run: |
+          curl -fsS -X POST "$RENDER_API_DEPLOY_HOOK"
+        env:
+          RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
