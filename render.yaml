@@ -13,7 +13,7 @@ services:
       corepack prepare yarn@4.10.3 --activate || true && 
       yarn install --immutable &&
       yarn workspace @warehouse/api build
-    startCommand: yarn workspace @warehouse/api start:prod
+    startCommand: yarn workspace @warehouse/api start
 
   - type: web
     name: warehouse-web
