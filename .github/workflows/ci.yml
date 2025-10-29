@@ -13,6 +13,8 @@ concurrency:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    env:
+      YARN_IGNORE_PATH: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
