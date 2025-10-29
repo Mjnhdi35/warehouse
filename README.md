@@ -29,18 +29,31 @@ yarn dev
 
 ### Render.com Configuration
 
-The project is configured to work with Render.com:
+**For Web Service (Nuxt.js):**
 
 - **Build Command**: `yarn build`
 - **Start Command**: `yarn start`
 - **Node Version**: 22.16.0
+- **Environment**: Node
+
+**For API Service (NestJS) - Optional:**
+
+- **Build Command**: `yarn build:api`
+- **Start Command**: `yarn start:api`
+- **Node Version**: 22.16.0
+- **Environment**: Node
 
 The build process automatically:
 
 1. Enables Corepack to use Yarn 4.10.3
 2. Installs dependencies
-3. Builds the web application
+3. Builds the application
 4. Prepares the server for production
+
+**Important**: Make sure to set the correct service type in Render.com:
+
+- For web app: Use "Web Service"
+- For API: Use "Background Worker" or separate "Web Service"
 
 ### Manual Deployment
 
