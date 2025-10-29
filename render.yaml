@@ -9,7 +9,7 @@ services:
       yarn install --immutable &&
       yarn nx build api
     startCommand: >
-      yarn nx start:prod api
+      yarn nx start api
 
   - type: web
     name: warehouse-web
