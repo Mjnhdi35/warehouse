@@ -1,13 +1,8 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CoreEntity } from '../../../common/base/base.entity';
 
 @Entity({ name: 'users' })
-export class UserEntity {
+export class UserEntity extends CoreEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -20,9 +15,9 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-  createdAt: Date;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  avatar?: string;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-  updatedAt: Date;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  phone?: string;
 }

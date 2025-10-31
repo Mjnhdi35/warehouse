@@ -1,13 +1,8 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CoreEntity } from '../../../common/base/base.entity';
 
 @Entity({ name: 'roles' })
-export class RoleEntity {
+export class RoleEntity extends CoreEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -16,10 +11,4 @@ export class RoleEntity {
 
   @Column({ type: 'varchar', length: 255 })
   description: string;
-
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-  updatedAt: Date;
 }
