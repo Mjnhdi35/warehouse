@@ -12,9 +12,9 @@ services:
     buildCommand: |
       corepack enable || true &&
       corepack prepare yarn@4.10.3 --activate || true && 
-      NODE_OPTIONS="--max-old-space-size=768" yarn install --immutable &&
-      NODE_OPTIONS="--max-old-space-size=768" yarn workspace @warehouse/api build
-    startCommand: NODE_OPTIONS="--max-old-space-size=512" && yarn start:prod
+      NODE_OPTIONS="--max-old-space-size=450" yarn install --immutable &&
+      NODE_OPTIONS="--max-old-space-size=450" yarn workspace @warehouse/api build
+    startCommand: NODE_OPTIONS="--max-old-space-size=384" && yarn start:prod
 
   - type: web
     name: warehouse-web
@@ -29,6 +29,6 @@ services:
     buildCommand: |
       corepack enable || true && 
       corepack prepare yarn@4.10.3 --activate || true && 
-      NODE_OPTIONS="--max-old-space-size=768" yarn install --immutable && 
-      NODE_OPTIONS="--max-old-space-size=768" yarn workspace @warehouse/web build
+      NODE_OPTIONS="--max-old-space-size=450" yarn install --immutable && 
+      NODE_OPTIONS="--max-old-space-size=450" yarn workspace @warehouse/web build
     startCommand: yarn workspace @warehouse/web start
