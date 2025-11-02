@@ -1,6 +1,4 @@
-// @ts-ignore - Node.js modules are available in Nuxt server routes
 import { readdir, stat } from 'fs/promises';
-// @ts-ignore
 import { join } from 'path';
 
 export default defineEventHandler(async (event) => {
@@ -10,10 +8,8 @@ export default defineEventHandler(async (event) => {
   try {
     // Giới hạn trong workspace để bảo mật
     const normalizedPath = pathParam.replace(/\.\./g, '');
-    // @ts-ignore
     const safePath = join(process.cwd(), normalizedPath);
     const resolvedPath = safePath.replace(/\\/g, '/');
-    // @ts-ignore
     const cwd = process.cwd().replace(/\\/g, '/');
 
     // Đảm bảo không vượt quá workspace root
@@ -36,7 +32,6 @@ export default defineEventHandler(async (event) => {
             type: entry.isDirectory() ? 'directory' : 'file',
             size: entry.isFile() ? stats.size : null,
             modified: stats.mtime.toISOString(),
-            // @ts-ignore
             path: fullPath.replace(process.cwd(), '.').replace(/\\/g, '/'),
           };
         },
@@ -44,9 +39,7 @@ export default defineEventHandler(async (event) => {
     );
 
     return {
-      // @ts-ignore
       path: resolvedPath.replace(process.cwd(), '.').replace(/\\/g, '/'),
-      // @ts-ignore
       currentDir: process.cwd(),
       files: files.sort(
         (
