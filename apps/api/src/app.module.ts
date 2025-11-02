@@ -10,11 +10,11 @@ import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    DatabaseModule,
-    RedisModule,
-    HealthModule,
-    //modules
-    UsersModule,
+    // DatabaseModule,
+    // RedisModule,
+    // HealthModule,
+    // //modules
+    // UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
