@@ -17,7 +17,9 @@ export async function createRedisClient(): Promise<AnyRedisClient> {
     url: process.env.REDIS_URL!,
   });
 
-  client.on('error', (err) => console.error('Redis Client Error:', err));
+  client.on('error', (error: any) =>
+    console.error('Redis Client Error:', error),
+  );
   await client.connect();
 
   return client;

@@ -12,6 +12,7 @@
     "tsc": "yarn nx run-many -t tsc",
     "lint": "yarn nx run-many -t lint",
     "build": "yarn nx run-many -t build",
+    "api:test:e2e": "yarn workspace @warehouse/api test:e2e",
     "valid": "yarn format && yarn tsc && yarn lint && yarn build",
     "shell": "chmod +x scripts/*.sh",
     "shell:check": "./scripts/systems/*.sh"

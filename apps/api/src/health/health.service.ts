@@ -13,11 +13,11 @@ export class HealthService {
 
   async check() {
     return this.health.check([
-      async () => ({
+      () => ({
         app: { status: 'up' },
       }),
 
-      async () => this.db.pingCheck('database'),
+      async () => await this.db.pingCheck('database'),
 
       async () => {
         const isHealthy = await this.redis.ping();

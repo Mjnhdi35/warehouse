@@ -5,7 +5,6 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import type { Redis as UpstashRedis } from '@upstash/redis';
-import type { RedisClientType } from 'redis';
 import { createRedisClient, AnyRedisClient } from './redis.config';
 
 @Injectable()
@@ -36,9 +35,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       if (ttlSeconds) await this.client.setEx(key, ttlSeconds, data);
       else await this.client.set(key, data);
     } else {
-      if (ttlSeconds)
-        await (this.client as UpstashRedis).set(key, data, { ex: ttlSeconds });
-      else await (this.client as UpstashRedis).set(key, data);
+      if (ttlSeconds) await this.client.set(key, data, { ex: ttlSeconds });
+      else await this.client.set(key, data);
     }
   }
 
@@ -51,7 +49,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       raw = await (this.client as UpstashRedis).get<string>(key);
     }
 
-    return raw ? JSON.parse(raw) : null;
+    return raw ? (JSON.parse(raw) as T) : null;
   }
 
   async del(key: string): Promise<void> {
@@ -67,8 +65,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       }
       const res = await (this.client as UpstashRedis).ping();
       return res === 'PONG';
-    } catch (err) {
-      this.logger.error('Redis ping failed', err);
+    } catch (error: any) {
+      const msg =
+        error instanceof Error
+          ? `${error.name}: ${error.message}`
+          : String(error);
+      this.logger.error('Redis ping failed', msg);
       return false;
     }
   }
