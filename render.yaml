@@ -14,7 +14,7 @@ services:
       corepack prepare yarn@4.10.3 --activate || true && 
       NODE_OPTIONS="--max-old-space-size=768" yarn install --immutable &&
       NODE_OPTIONS="--max-old-space-size=768" yarn workspace @warehouse/api build
-    startCommand: yarn workspace @warehouse/api start
+    startCommand: cd apps/api && NODE_OPTIONS="--max-old-space-size=512" node dist/main
 
   - type: web
     name: warehouse-web
