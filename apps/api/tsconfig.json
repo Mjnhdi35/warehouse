@@ -1,17 +1,20 @@
 {
   "version": "5.7.3",
   "compilerOptions": {
-    "lib": ["es5", "es6"],
-    "target": "es6",
+    "target": "es2022",
     "module": "commonjs",
     "moduleResolution": "node",
     "types": ["node", "jest"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "outDir": "./dist",
     "rootDir": ".",
-    "strict": true
+    "strict": true,
+    "strictPropertyInitialization": false
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*.ts", "test/**/*.ts"]
