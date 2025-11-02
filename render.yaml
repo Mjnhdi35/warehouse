@@ -3,7 +3,7 @@ services:
     name: warehouse-api
     runtime: node
     plan: free
-    rootDir: apps/api
+    rootDir: .
     autoDeploy: false
     envVars:
       - key: NODE_ENV
@@ -12,15 +12,17 @@ services:
     buildCommand: |
       corepack enable || true &&
       corepack prepare yarn@4.10.3 --activate || true && 
-      NODE_OPTIONS="--max-old-space-size=450" yarn install --immutable &&
-      NODE_OPTIONS="--max-old-space-size=450" yarn build
-    startCommand: NODE_OPTIONS="--max-old-space-size=384" && yarn start:prod
+      NODE_OPTIONS="--max-old-space-size=400" yarn install --immutable &&
+      NODE_OPTIONS="--max-old-space-size=400" yarn workspaces focus @warehouse/api --production &&
+      rm -rf apps/web node_modules/@warehouse/web 2>/dev/null || true &&
+      NODE_OPTIONS="--max-old-space-size=400" yarn workspace @warehouse/api build
+    startCommand: cd apps/api && NODE_OPTIONS="--max-old-space-size=350" yarn start:prod
 
   - type: web
     name: warehouse-web
     runtime: node
     plan: free
-    rootDir: apps/web
+    rootDir: .
     autoDeploy: false
     envVars:
       - key: NODE_ENV
@@ -29,6 +31,8 @@ services:
     buildCommand: |
       corepack enable || true && 
       corepack prepare yarn@4.10.3 --activate || true && 
-      NODE_OPTIONS="--max-old-space-size=450" yarn install --immutable && 
-      NODE_OPTIONS="--max-old-space-size=450" yarn build
-    startCommand: yarn start
+      NODE_OPTIONS="--max-old-space-size=400" yarn install --immutable &&
+      NODE_OPTIONS="--max-old-space-size=400" yarn workspaces focus @warehouse/web --production &&
+      rm -rf apps/api node_modules/@warehouse/api 2>/dev/null || true &&
+      NODE_OPTIONS="--max-old-space-size=400" yarn workspace @warehouse/web build
+    startCommand: yarn workspace @warehouse/web start
