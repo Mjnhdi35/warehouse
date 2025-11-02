@@ -3,7 +3,7 @@ services:
     name: warehouse-api
     runtime: node
     plan: free
-    rootDir: .
+    rootDir: apps/api
     autoDeploy: false
     envVars:
       - key: NODE_ENV
@@ -13,14 +13,14 @@ services:
       corepack enable || true &&
       corepack prepare yarn@4.10.3 --activate || true && 
       NODE_OPTIONS="--max-old-space-size=450" yarn install --immutable &&
-      NODE_OPTIONS="--max-old-space-size=450" yarn workspace @warehouse/api build
+      NODE_OPTIONS="--max-old-space-size=450" yarn build
     startCommand: NODE_OPTIONS="--max-old-space-size=384" && yarn start:prod
 
   - type: web
     name: warehouse-web
     runtime: node
     plan: free
-    rootDir: .
+    rootDir: apps/web
     autoDeploy: false
     envVars:
       - key: NODE_ENV
@@ -30,5 +30,5 @@ services:
       corepack enable || true && 
       corepack prepare yarn@4.10.3 --activate || true && 
       NODE_OPTIONS="--max-old-space-size=450" yarn install --immutable && 
-      NODE_OPTIONS="--max-old-space-size=450" yarn workspace @warehouse/web build
-    startCommand: yarn workspace @warehouse/web start
+      NODE_OPTIONS="--max-old-space-size=450" yarn build
+    startCommand: yarn start
