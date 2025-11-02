@@ -4695,6 +4695,7 @@ __metadata:
   resolution: "@warehouse/web@workspace:apps/web"
   dependencies:
     "@nuxt/eslint": "npm:1.10.0"
+    "@types/node": "npm:^22.10.7"
     eslint: "npm:^9.0.0"
     nuxt: "npm:^4.2.0"
     typescript: "npm:^5.9.3"
