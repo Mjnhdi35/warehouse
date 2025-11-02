@@ -2,6 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { readdir, stat } from 'fs/promises';
 import { join } from 'path';
 
+interface FileInfo {
+  name: string;
+  type: 'directory' | 'file';
+  size: number | null;
+  modified: string;
+  path: string;
+}
+
+interface ListFilesResponse {
+  path: string;
+  currentDir: string;
+  files: FileInfo[];
+}
+
+interface ListFilesErrorResponse {
+  error: string;
+  path: string;
+}
+
+type ListFilesResult = ListFilesResponse | ListFilesErrorResponse;
+
 @Injectable()
 export class AppService {
   getHello(): string {
@@ -24,7 +45,7 @@ export class AppService {
     };
   }
 
-  async listFiles(path: string = '.'): Promise<any> {
+  async listFiles(path: string = '.'): Promise<ListFilesResult> {
     try {
       // Giới hạn trong workspace để bảo mật
       const normalizedPath = path.replace(/\.\./g, '');
@@ -38,7 +59,7 @@ export class AppService {
       }
 
       const entries = await readdir(resolvedPath, { withFileTypes: true });
-      const files = await Promise.all(
+      const files: FileInfo[] = await Promise.all(
         entries.map(async (entry) => {
           const fullPath = join(resolvedPath, entry.name);
           const stats = await stat(fullPath);

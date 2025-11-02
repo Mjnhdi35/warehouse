@@ -16,7 +16,7 @@ export class AppController {
   }
 
   @Get('files')
-  async listFiles(@Query('path') path?: string) {
+  async listFiles(@Query('path') path?: string): Promise<unknown> {
     return await this.appService.listFiles(path);
   }
 }
