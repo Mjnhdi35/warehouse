@@ -1,6 +1,10 @@
 {
   "name": "warehouse",
   "packageManager": "yarn@4.10.3",
+  "author": "smoothie",
+  "repository": {
+    "url": "https://github.com/Mjnhdi35/warehouse.git"
+  },
   "private": true,
   "workspaces": [
     "packages/*",
