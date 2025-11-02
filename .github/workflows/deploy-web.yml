@@ -10,10 +10,30 @@ on:
       - 'nx.json'
       - 'render.yaml'
 
+concurrency:
+  group: deploy-web-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      YARN_IGNORE_PATH: '1'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Corepack/Yarn 4
+        run: |
+          corepack enable
+          corepack prepare yarn@4.10.3 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build Web
+        run: yarn workspace @warehouse/web build
+
       - name: Trigger Render Web deploy
         run: |
           curl -fsS -X POST "$RENDER_WEB_DEPLOY_HOOK"

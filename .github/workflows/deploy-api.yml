@@ -10,10 +10,30 @@ on:
       - 'nx.json'
       - 'render.yaml'
 
+concurrency:
+  group: deploy-api-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      YARN_IGNORE_PATH: '1'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Corepack/Yarn 4
+        run: |
+          corepack enable
+          corepack prepare yarn@4.10.3 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build API
+        run: yarn workspace @warehouse/api build
+
       - name: Trigger Render API deploy
         run: |
           curl -fsS -X POST "$RENDER_API_DEPLOY_HOOK"
