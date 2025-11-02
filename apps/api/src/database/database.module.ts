@@ -23,6 +23,7 @@ import { DatabaseService } from './database.service';
       }),
     }),
   ],
+  exports: [TypeOrmModule],
   providers: [DatabaseService],
 })
 export class DatabaseModule {}
