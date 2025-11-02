@@ -15,7 +15,6 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepo: Repository<UserEntity>,
-
     private readonly configService: ConfigService,
   ) {}
 
