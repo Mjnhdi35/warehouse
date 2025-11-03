@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { CoreEntity } from '../../../common/base/base.entity';
+import { CoreEntity } from '../../../common/base/entities/base.entity';
 
 @Entity({ name: 'permissions' })
 export class PermissionEntity extends CoreEntity {

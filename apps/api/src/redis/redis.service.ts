@@ -65,7 +65,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       }
       const res = await (this.client as UpstashRedis).ping();
       return res === 'PONG';
-    } catch (error: any) {
+    } catch (error: unknown) {
       const msg =
         error instanceof Error
           ? `${error.name}: ${error.message}`

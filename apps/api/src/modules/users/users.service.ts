@@ -6,46 +6,76 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dtos/user.dto';
-import { hash } from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
+import { CreateUserDto, UpdateUserDto } from './dtos/user.dto';
+import { BcryptService } from '../../common';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepo: Repository<UserEntity>,
-    private readonly configService: ConfigService,
+    private readonly bcryptService: BcryptService,
   ) {}
 
   async create(body: CreateUserDto) {
     const { email, password, ...data } = body;
-    const existingUser = await this.findByEmail(email);
-    if (!existingUser) {
+    const existingUser = await this.usersRepo.findOne({ where: { email } });
+    if (existingUser) {
       throw new ConflictException('Duplicated!');
     }
-    const hashPass = await hash(
-      password,
-      +this.configService.getOrThrow<number>('SALTS'),
-    );
+    const hashPass = await this.bcryptService.hashPassword(password);
     const newUser = this.usersRepo.create({
       email,
       password: hashPass,
       ...data,
     });
     const saveUser = await this.usersRepo.save(newUser);
-    return saveUser;
+    return this.usersRepo.findOneByOrFail({ id: saveUser.id });
   }
 
-  async findByEmail(email: string) {
-    const user = await this.usersRepo.find({ where: { email } });
+  async findOneByEmail(email: string) {
+    const user = await this.usersRepo
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
     if (!user) {
       throw new NotFoundException('Not Found!');
     }
     return user;
   }
 
-  async getAll() {
-    return await this.usersRepo.find();
+  async findAll() {
+    return this.usersRepo.find();
+  }
+
+  async findOneById(id: string) {
+    const user = await this.usersRepo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('Not Found!');
+    return user;
+  }
+
+  async update(id: string, body: UpdateUserDto) {
+    const user = await this.usersRepo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('Not Found!');
+    if (body.email && body.email !== user.email) {
+      const dup = await this.usersRepo.findOne({
+        where: { email: body.email },
+      });
+      if (dup) throw new ConflictException('Duplicated!');
+    }
+    if (body.password) {
+      body.password = await this.bcryptService.hashPassword(body.password);
+    }
+    const merged = this.usersRepo.merge(user, body);
+    const saved = await this.usersRepo.save(merged);
+    return this.findOneById(saved.id);
+  }
+
+  async remove(id: string) {
+    const user = await this.usersRepo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('Not Found!');
+    await this.usersRepo.remove(user);
+    return { success: true };
   }
 }

@@ -1,30 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { RedisService } from '../redis/redis.service';
 import { join, resolve } from 'path';
 import { opendir, stat } from 'fs/promises';
 import { Dirent } from 'fs';
 import { DataSource } from 'typeorm';
-
-interface FileInfo {
-  name: string;
-  type: 'directory' | 'file';
-  size?: number;
-  modified?: string;
-  path: string;
-}
-
-interface ListFilesResponse {
-  path: string;
-  currentDir: string;
-  files: FileInfo[];
-}
-
-interface ListFilesErrorResponse {
-  error: string;
-  path: string;
-}
-
-type ListFilesResult = ListFilesResponse | ListFilesErrorResponse;
+import { RedisService } from '../../redis/redis.service';
+import { ListFilesResult } from '../types/health.type';
+import { FileInfo } from '../interfaces/health.interface';
 
 @Injectable()
 export class HealthService {
