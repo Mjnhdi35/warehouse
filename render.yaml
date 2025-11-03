@@ -12,10 +12,13 @@ services:
     buildCommand: |
       corepack enable || true &&
       corepack prepare yarn@4.10.3 --activate || true && 
-      NODE_OPTIONS="--max-old-space-size=400" yarn install --immutable &&
-      NODE_OPTIONS="--max-old-space-size=400" yarn workspace @warehouse/api build &&
-      NODE_OPTIONS="--max-old-space-size=400" yarn workspaces focus @warehouse/api --production &&
-      rm -rf apps/web node_modules/@warehouse/web 2>/dev/null || true
+      rm -rf apps/web 2>/dev/null || true &&
+      NODE_OPTIONS="--max-old-space-size=350" yarn install --immutable &&
+      cd apps/api &&
+      yarn migration:run &&
+      NODE_OPTIONS="--max-old-space-size=350" yarn workspace @warehouse/api build &&
+      NODE_OPTIONS="--max-old-space-size=350" yarn workspaces focus @warehouse/api --production &&
+      rm -rf node_modules/@warehouse/web 2>/dev/null || true
     startCommand: cd apps/api && NODE_OPTIONS="--max-old-space-size=350" node dist/src/main.js
 
   - type: web
@@ -31,8 +34,9 @@ services:
     buildCommand: |
       corepack enable || true && 
       corepack prepare yarn@4.10.3 --activate || true && 
-      NODE_OPTIONS="--max-old-space-size=400" yarn install --immutable &&
-      NODE_OPTIONS="--max-old-space-size=400" yarn workspace @warehouse/web build &&
-      NODE_OPTIONS="--max-old-space-size=400" yarn workspaces focus @warehouse/web --production &&
-      rm -rf apps/api node_modules/@warehouse/api 2>/dev/null || true
+      rm -rf apps/api 2>/dev/null || true &&
+      NODE_OPTIONS="--max-old-space-size=350" yarn install --immutable &&
+      NODE_OPTIONS="--max-old-space-size=350" yarn workspace @warehouse/web build &&
+      NODE_OPTIONS="--max-old-space-size=350" yarn workspaces focus @warehouse/web --production &&
+      rm -rf node_modules/@warehouse/api 2>/dev/null || true
     startCommand: yarn workspace @warehouse/web start

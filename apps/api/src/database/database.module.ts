@@ -9,7 +9,7 @@ import { DatabaseService } from './database.service';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.getOrThrow<string>('DB_URL'),
+        url: configService.getOrThrow<string>('DATABASE_URL'),
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV === 'development',
         logging: process.env.NODE_ENV === 'development',

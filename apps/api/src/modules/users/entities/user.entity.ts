@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { CoreEntity } from '../../../common/base/base.entity';
+import { Exclude } from 'class-transformer';
+import { CoreEntity } from '../../../common/base/entities/base.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends CoreEntity {
@@ -12,7 +13,8 @@ export class UserEntity extends CoreEntity {
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Exclude({ toPlainOnly: true })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
