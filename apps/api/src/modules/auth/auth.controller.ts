@@ -9,7 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
+import { AuthFacade } from './auth.facade';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateUserDto } from '../users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
@@ -18,7 +18,7 @@ import { AuthRequestUser, getBearerToken, Public } from '../../common';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authFacade: AuthFacade) {}
 
   private isAuthRequestUser(u: unknown): u is AuthRequestUser {
     return (
@@ -35,7 +35,7 @@ export class AuthController {
     @Body() body: LoginDto,
     @Req() req: Request,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const result = await this.authService.login(body);
+    const result = await this.authFacade.login(body);
     if (result?.accessToken) {
       (req.res as Response).setHeader(
         'Authorization',
@@ -58,7 +58,7 @@ export class AuthController {
     @Body() body: CreateUserDto,
     @Req() req: Request,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const result = await this.authService.register(body);
+    const result = await this.authFacade.register(body);
     if (result?.accessToken) {
       (req.res as Response).setHeader(
         'Authorization',
@@ -77,7 +77,7 @@ export class AuthController {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const token = getBearerToken(auth) ?? body?.refreshToken ?? '';
     if (!token) throw new UnauthorizedException('Missing refresh token');
-    const result = await this.authService.refresh(token);
+    const result = await this.authFacade.refresh(token);
     if (result?.accessToken) {
       (req.res as Response).setHeader(
         'Authorization',
@@ -95,6 +95,6 @@ export class AuthController {
   ): Promise<{ success: true }> {
     const token = getBearerToken(auth) ?? body?.refreshToken ?? '';
     if (!token) throw new UnauthorizedException('Missing refresh token');
-    return this.authService.logout(token);
+    return this.authFacade.logout(token);
   }
 }

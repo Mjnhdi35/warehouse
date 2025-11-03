@@ -4,5 +4,3 @@ export interface PasswordHasher {
 }
 
 export const PASSWORD_HASHER = 'PASSWORD_HASHER';
-
-

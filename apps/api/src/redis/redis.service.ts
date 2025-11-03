@@ -41,15 +41,25 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    let raw: string | null;
+    let value: unknown = null;
 
     if ('get' in this.client) {
-      raw = await this.client.get(key);
+      const raw = await this.client.get(key);
+      value = raw;
     } else {
-      raw = await (this.client as UpstashRedis).get<string>(key);
+      value = await (this.client as UpstashRedis).get(key);
     }
 
-    return raw ? (JSON.parse(raw) as T) : null;
+    if (value == null) return null;
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value) as T;
+      } catch {
+        return value as unknown as T;
+      }
+    }
+
+    return value as T;
   }
 
   async del(key: string): Promise<void> {

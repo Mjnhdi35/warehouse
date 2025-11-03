@@ -11,6 +11,8 @@ import { TokensService } from './tokens.service';
 import { RefreshTokenStore } from './refresh-token.store';
 import { TOKEN_STORE } from './interfaces/token-store.interface';
 import { BcryptService } from '../../common';
+import { PASSWORD_HASHER } from './interfaces/password-hasher.interface';
+import { AuthFacade } from './auth.facade';
 
 @Module({
   imports: [
@@ -31,9 +33,10 @@ import { BcryptService } from '../../common';
   controllers: [AuthController],
   providers: [
     AuthService,
+    AuthFacade,
     JwtStrategy,
     TokensService,
-    BcryptService,
+    { provide: PASSWORD_HASHER, useClass: BcryptService },
     { provide: TOKEN_STORE, useClass: RefreshTokenStore },
   ],
 })

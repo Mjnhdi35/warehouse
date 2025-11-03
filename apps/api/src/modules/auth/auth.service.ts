@@ -1,57 +1,24 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dtos/user.dto';
-import { TokensService } from './tokens.service';
-import { LoginDto } from './dtos/login.dto';
-import { BcryptService } from '../../common';
+import { Inject } from '@nestjs/common';
+import {
+  PASSWORD_HASHER,
+  PasswordHasher,
+} from './interfaces/password-hasher.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly tokensService: TokensService,
-    private readonly bcryptService: BcryptService,
+    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
   ) {}
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findOneByEmail(email);
-    const isMatch = await this.bcryptService.compare(password, user.password);
+    const isMatch = await this.passwordHasher.compare(password, user.password);
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
     return user;
-  }
-
-  async login(body: LoginDto) {
-    const user = await this.validateUser(body.email, body.password);
-    return this.tokensService.issueFor(user);
-  }
-
-  async register(body: CreateUserDto) {
-    const exists = await this.usersService
-      .findOneByEmail(body.email)
-      .then(() => true)
-      .catch(() => false);
-    if (exists) {
-      throw new ConflictException('Email already in use');
-    }
-    const newUser = await this.usersService.create(body);
-    return this.tokensService.issueFor(newUser);
-  }
-
-  async refresh(token: string) {
-    const payload = await this.tokensService.rotate(token);
-    const entity = await this.usersService.findOneByEmail(payload.email);
-    const { accessToken, refreshToken } =
-      await this.tokensService.issueFor(entity);
-    return { accessToken, refreshToken };
-  }
-
-  async logout(token: string): Promise<{ success: true }> {
-    return this.tokensService.revoke(token);
   }
 }
