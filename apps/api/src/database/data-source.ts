@@ -4,7 +4,7 @@ config();
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  url: process.env.DB_URL,
+  url: process.env.DATABASE_URL!,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   migrationsRun: false,
