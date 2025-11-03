@@ -4,7 +4,6 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { UserEntity } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dtos/user.dto';
 import { TokensService } from './tokens.service';
 import { LoginDto } from './dtos/login.dto';
@@ -18,7 +17,7 @@ export class AuthService {
     private readonly bcryptService: BcryptService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<UserEntity> {
+  async validateUser(email: string, password: string) {
     const user = await this.usersService.findOneByEmail(email);
     const isMatch = await this.bcryptService.compare(password, user.password);
     if (!isMatch) {
@@ -52,7 +51,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async logout(token: string) {
+  async logout(token: string): Promise<{ success: true }> {
     return this.tokensService.revoke(token);
   }
 }

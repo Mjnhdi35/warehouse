@@ -2,7 +2,9 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from '../users/entities/user.entity';
-import { RefreshTokenStore } from './refresh-token.store';
+import { Inject } from '@nestjs/common';
+import { TOKEN_STORE, TokenStore } from './interfaces/token-store.interface';
+import { extractExp, extractSub } from '../../common';
 import {
   ACCESS_TOKEN_EXPIRES,
   buildPayload,
@@ -15,8 +17,7 @@ export class TokensService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-
-    private readonly refreshStore: RefreshTokenStore,
+    @Inject(TOKEN_STORE) private readonly refreshStore: TokenStore,
   ) {}
 
   private readonly logger = new Logger(TokensService.name);
@@ -35,8 +36,8 @@ export class TokensService {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       expiresIn: REFRESH_TOKEN_EXPIRES,
     });
-    const decoded = this.jwtService.decode(token) as { exp?: number } | null;
-    await this.refreshStore.allow(user.id, token, decoded?.exp);
+    const exp = extractExp(this.jwtService.decode(token));
+    await this.refreshStore.allow(user.id, token, exp);
     return token;
   }
 
@@ -63,20 +64,14 @@ export class TokensService {
     return payload;
   }
 
-  async revoke(refreshToken: string) {
-    const decoded = this.jwtService.decode(refreshToken) as {
-      sub?: string;
-      exp?: number;
-    } | null;
-    const sub: string | undefined = decoded?.sub;
+  async revoke(refreshToken: string): Promise<{ success: true }> {
+    const decoded: unknown = this.jwtService.decode(refreshToken);
+    const sub = extractSub(decoded);
+    const exp = extractExp(decoded);
     if (sub) await this.refreshStore.revoke(sub, refreshToken);
-    await this.refreshStore.blacklist(
-      refreshToken,
-      decoded?.exp,
-      sub ?? 'unknown',
-    );
+    await this.refreshStore.blacklist(refreshToken, exp, sub ?? 'unknown');
     this.logger.log(`Revoked refresh token for user=${sub ?? 'unknown'}`);
-    return { success: true };
+    return { success: true } as const;
   }
 
   private async verifyRefresh(token: string): Promise<RefreshJwtPayload> {
@@ -88,4 +83,6 @@ export class TokensService {
         throw new UnauthorizedException('Invalid refresh token');
       });
   }
+
+  // using shared extractExp/extractSub from common utils
 }

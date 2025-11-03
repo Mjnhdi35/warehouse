@@ -9,8 +9,10 @@ import {
 type RefreshAllowValue = { uid: string };
 type BlacklistValue = { uid: string };
 
+import { TokenStore } from './interfaces/token-store.interface';
+
 @Injectable()
-export class RefreshTokenStore {
+export class RefreshTokenStore implements TokenStore {
   constructor(private readonly redis: RedisService) {}
 
   async allow(userId: string, token: string, exp?: number): Promise<void> {

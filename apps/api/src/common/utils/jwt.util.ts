@@ -27,5 +27,21 @@ export function computeTtlFromEpochSeconds(
   exp?: number,
   nowSec: number = Math.floor(Date.now() / 1000),
 ): number {
-  return Math.max(0, ((exp as number | undefined) ?? nowSec) - nowSec);
+  return Math.max(0, (exp ?? nowSec) - nowSec);
+}
+
+export function extractExp(decoded: unknown): number | undefined {
+  if (decoded && typeof decoded === 'object') {
+    const exp = (decoded as Record<string, unknown>).exp;
+    if (typeof exp === 'number') return exp;
+  }
+  return undefined;
+}
+
+export function extractSub(decoded: unknown): string | undefined {
+  if (decoded && typeof decoded === 'object') {
+    const sub = (decoded as Record<string, unknown>).sub;
+    if (typeof sub === 'string') return sub;
+  }
+  return undefined;
 }

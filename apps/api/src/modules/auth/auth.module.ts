@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { RedisModule } from '../../redis/redis.module';
 import { TokensService } from './tokens.service';
 import { RefreshTokenStore } from './refresh-token.store';
+import { TOKEN_STORE } from './interfaces/token-store.interface';
 import { BcryptService } from '../../common';
 
 @Module({
@@ -19,7 +20,7 @@ import { BcryptService } from '../../common';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
+      useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
           expiresIn: +config.getOrThrow<number>('JWT_EXPIRES'),
@@ -33,7 +34,7 @@ import { BcryptService } from '../../common';
     JwtStrategy,
     TokensService,
     BcryptService,
-    RefreshTokenStore,
+    { provide: TOKEN_STORE, useClass: RefreshTokenStore },
   ],
 })
 export class AuthModule {}

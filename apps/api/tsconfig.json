@@ -15,7 +15,10 @@
     "rootDir": ".",
     "strict": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "useUnknownInCatchVariables": true
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*.ts", "test/**/*.ts"]

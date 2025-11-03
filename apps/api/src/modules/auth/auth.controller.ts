@@ -20,9 +20,21 @@ import { AuthRequestUser, getBearerToken, Public } from '../../common';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  private isAuthRequestUser(u: unknown): u is AuthRequestUser {
+    return (
+      typeof u === 'object' &&
+      u !== null &&
+      'userId' in (u as Record<string, unknown>) &&
+      'email' in (u as Record<string, unknown>)
+    );
+  }
+
   @Public()
   @Post('login')
-  async login(@Body() body: LoginDto, @Req() req: Request): Promise<any> {
+  async login(
+    @Body() body: LoginDto,
+    @Req() req: Request,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const result = await this.authService.login(body);
     if (result?.accessToken) {
       (req.res as Response).setHeader(
@@ -35,13 +47,17 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  whoami(@Req() req: Request & { user?: AuthRequestUser }) {
-    return (req as any).user;
+  whoami(@Req() req: Request): AuthRequestUser | undefined {
+    const candidate = (req as unknown as { user?: unknown }).user;
+    return this.isAuthRequestUser(candidate) ? candidate : undefined;
   }
 
   @Public()
   @Post('register')
-  async register(@Body() body: CreateUserDto, @Req() req: Request) {
+  async register(
+    @Body() body: CreateUserDto,
+    @Req() req: Request,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const result = await this.authService.register(body);
     if (result?.accessToken) {
       (req.res as Response).setHeader(
@@ -58,7 +74,7 @@ export class AuthController {
     @Headers('authorization') auth: string,
     @Body() body: RefreshTokenDto,
     @Req() req: Request,
-  ) {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const token = getBearerToken(auth) ?? body?.refreshToken ?? '';
     if (!token) throw new UnauthorizedException('Missing refresh token');
     const result = await this.authService.refresh(token);
@@ -76,7 +92,7 @@ export class AuthController {
   async logout(
     @Headers('authorization') auth: string,
     @Body() body: RefreshTokenDto,
-  ) {
+  ): Promise<{ success: true }> {
     const token = getBearerToken(auth) ?? body?.refreshToken ?? '';
     if (!token) throw new UnauthorizedException('Missing refresh token');
     return this.authService.logout(token);
