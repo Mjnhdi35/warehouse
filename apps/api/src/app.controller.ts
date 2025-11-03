@@ -9,14 +9,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
-  @Get('info')
-  getInfo() {
-    return this.appService.getInfo();
-  }
-
-  @Get('files')
-  async listFiles(@Query('path') path?: string): Promise<unknown> {
-    return await this.appService.listFiles(path);
-  }
 }
