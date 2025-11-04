@@ -1,8 +1,4 @@
 <script setup lang="ts">
-defineOptions({
-  name: 'AppLogo',
-});
-
 interface Props {
   /**
    * Text hiển thị cho logo
@@ -93,20 +89,17 @@ const logoClasses = computed(() => [
         :alt="alt"
         :class="iconSizeClasses[size]"
         class="object-contain"
-      >
+      />
     </template>
 
-    <!-- Default Icon (nếu không có icon/image và không có text) -->
     <Icon
       v-if="!icon && !image && !text"
       name="i-lucide-warehouse"
       :class="iconSizeClasses[size]"
     />
 
-    <!-- Text -->
     <span v-if="text" class="font-semibold">{{ text }}</span>
 
-    <!-- Trailing Icon/Image -->
     <template v-if="trailing && (icon || image)">
       <Icon v-if="icon && !image" :name="icon" :class="iconSizeClasses[size]" />
       <img
@@ -115,7 +108,7 @@ const logoClasses = computed(() => [
         :alt="alt"
         :class="iconSizeClasses[size]"
         class="object-contain"
-      >
+      />
     </template>
   </ULink>
 </template>

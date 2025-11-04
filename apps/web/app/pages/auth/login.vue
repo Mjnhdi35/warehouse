@@ -3,6 +3,7 @@ import LoginForm from '~/components/auth/LoginForm.vue';
 
 definePageMeta({
   layout: 'auth',
+  ssr: false,
 });
 </script>
 

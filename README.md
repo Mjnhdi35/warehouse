@@ -142,12 +142,14 @@ GOOGLE_CALLBACK_URL=http://localhost:3001/api/auth/google/callback
 
 #### Frontend Web
 
-Tạo file `.env` trong `apps/web/` (nếu cần):
+Tạo file `.env` trong `apps/web/`:
 
 ```env
-# API URL
-API_URL=http://localhost:3001/api
+# Backend API URL (server-side only, không lộ ra client)
+API_BASE_URL=http://localhost:3001/api
 ```
+
+**Lưu ý**: Backend URL được ẩn hoàn toàn. Tất cả API calls đi qua proxy `/api/*` để bảo mật backend URL.
 
 ### 5. Setup Database
 
@@ -619,8 +621,10 @@ Frontend testing có thể được setup với Vitest hoặc Playwright (chưa 
 
 ```env
 NODE_ENV=production
-API_URL=https://your-api-url.com/api
+API_BASE_URL=https://your-api-url.com/api
 ```
+
+**Lưu ý**: `API_BASE_URL` là server-side only, không lộ ra client. Tất cả API calls đi qua proxy.
 
 #### API Service (NestJS)
 
@@ -732,11 +736,42 @@ yarn start:debug
 
 ## 📚 Tài liệu tham khảo
 
+### External Documentation
+
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [Nuxt.js Documentation](https://nuxt.com/)
 - [TypeORM Documentation](https://typeorm.io/)
 - [Yarn Workspaces](https://yarnpkg.com/features/workspaces)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+
+### Internal Documentation
+
+#### Overview
+
+- [Project Overview](./docs/PROJECT_OVERVIEW.md) - Tổng quan về dự án
+
+#### Tech Stack
+
+- [Backend Tech Stack](./docs/BACKEND_TECH_STACK.md) - NestJS, TypeORM, Redis
+- [Frontend Tech Stack](./docs/FRONTEND_TECH_STACK.md) - Nuxt.js, Nuxt UI, Tailwind CSS v4
+- [TypeScript Guide](./docs/TYPESCRIPT_GUIDE.md) - TypeScript best practices
+
+#### Architecture
+
+- [Proxy Architecture](./docs/PROXY_ARCHITECTURE.md) - API proxy architecture
+- [Auth Architecture](./docs/AUTH_ARCHITECTURE.md) - Authentication architecture
+- [Modules Architecture](./docs/MODULES_ARCHITECTURE.md) - Module structure
+
+#### Setup & Development
+
+- [Google OAuth Setup](./docs/GOOGLE_OAUTH_SETUP.md) - Google OAuth 2.0 setup guide
+- [Environment Setup](./docs/ENVIRONMENT_SETUP.md) - Development environment setup
+- [Development Guide](./docs/DEVELOPMENT.md) - Development workflow
+
+#### App Documentation
+
+- [API README](./apps/api/README.md) - Backend API documentation
+- [Web README](./apps/web/README.md) - Frontend web documentation
 
 ## 📝 License
 

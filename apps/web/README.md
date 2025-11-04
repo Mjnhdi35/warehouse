@@ -55,7 +55,8 @@ public/                    # Static files
 
 ### Nuxt.js Features
 
-- **SSR**: Disabled (SSR: false) - Client-side rendering
+- **SSR**: Enabled for better SEO and performance
+- **Client-side pages**: Auth pages use `ssr: false` (client-side only)
 - **TypeScript**: Full TypeScript support
 - **Auto-imports**: Components, composables tự động import
 - **File-based routing**: Pages tự động từ `app/pages/`
@@ -112,17 +113,14 @@ export default defineNuxtConfig({
 
 ### Environment Variables
 
-Tạo file `.env` (nếu cần):
+Tạo file `.env` trong `apps/web/`:
 
 ```env
-API_URL=http://localhost:3001/api
+# Backend API URL (server-side only, không lộ ra client)
+API_BASE_URL=http://localhost:3001/api
 ```
 
-Access trong code:
-
-```typescript
-const apiUrl = useRuntimeConfig().public.apiUrl;
-```
+**Lưu ý**: Backend URL được ẩn hoàn toàn khỏi client. Tất cả API calls đều đi qua proxy `/api/*` để ẩn backend URL.
 
 ## 📦 Modules
 
@@ -186,49 +184,96 @@ Available layouts:
 
 ## 🔌 API Integration
 
+### API Proxy
+
+Tất cả API calls đều đi qua server proxy để **ẩn backend URL** khỏi client:
+
+- **Proxy Route**: `/api/*` → Server-side proxy
+- **Backend URL**: Ẩn hoàn toàn, chỉ có server biết
+- **Security**: Client không thể truy cập trực tiếp backend
+
 ### API Client
 
-Tạo composable hoặc plugin để gọi API:
+Sử dụng composable `useApi` để gọi API:
 
 ```typescript
-// composables/useApi.ts
-export const useApi = () => {
-  const config = useRuntimeConfig();
-  const apiUrl = config.public.apiUrl || 'http://localhost:3001/api';
+import { useApi } from '~/composables/useApi';
 
-  return {
-    async get<T>(endpoint: string) {
-      // API call logic
-    },
-    async post<T>(endpoint: string, data: any) {
-      // API call logic
-    },
-  };
-};
+// API call qua proxy
+const response = await useApi<{ accessToken: string }>('/auth/login', {
+  method: 'POST',
+  body: { email, password },
+});
 ```
 
-### Authentication
+Proxy tự động:
 
-Handle authentication state:
+- Forward request đến backend
+- Handle redirects (OAuth flows)
+- Forward response headers
+- Error handling
+
+### Composables
+
+#### useAuth
+
+Composable để quản lý authentication state và token storage:
 
 ```typescript
-// composables/useAuth.ts
-export const useAuth = () => {
-  const token = useCookie('token');
-  const user = useState('user');
+import { useAuth } from '~/composables/useAuth';
 
-  return {
-    token,
-    user,
-    isAuthenticated: computed(() => !!token.value),
-    login: async (email: string, password: string) => {
-      // Login logic
-    },
-    logout: async () => {
-      // Logout logic
-    },
-  };
-};
+const {
+  getAccessToken,
+  setAccessToken,
+  removeAccessToken,
+  isAuthenticated,
+  handleAuthSuccess,
+  handleAuthError,
+  logout,
+} = useAuth();
+```
+
+**Methods:**
+
+- `getAccessToken()` - Lấy access token cookie
+- `setAccessToken(token)` - Set access token cookie
+- `removeAccessToken()` - Xóa access token cookie
+- `isAuthenticated` - Computed property để check authentication state
+- `handleAuthSuccess(token, message?, redirectPath?)` - Handle successful authentication
+- `handleAuthError(error?, redirectPath?)` - Handle authentication error
+- `logout(redirectPath?)` - Logout user
+
+#### useApi
+
+Composable để gọi API qua proxy:
+
+```typescript
+import { useApi } from '~/composables/useApi';
+
+const response = await useApi<{ accessToken: string }>('/auth/login', {
+  method: 'POST',
+  body: { email, password },
+});
+```
+
+#### useForm
+
+Composable để quản lý form state và validation:
+
+```typescript
+import { useForm } from '~/composables/useForm';
+
+const { isSubmitting, error, success, handleSubmit, reset } = useForm<Schema>();
+```
+
+#### useApiLazy
+
+Lazy version của useApi - trả về reactive state:
+
+```typescript
+import { useApiLazy } from '~/composables/useApi';
+
+const { data, pending, error } = useApiLazy<{ users: User[] }>('/users');
 ```
 
 ## 🧪 Development

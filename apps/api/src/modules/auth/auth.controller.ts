@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 import { AuthFacade } from './auth.facade';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateUserDto } from '../users/dtos/user.dto';
@@ -28,7 +29,10 @@ import {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authFacade: AuthFacade) {}
+  constructor(
+    private readonly authFacade: AuthFacade,
+    private readonly configService: ConfigService,
+  ) {}
 
   private isAuthRequestUser(u: unknown): u is AuthRequestUser {
     return (
@@ -118,20 +122,35 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(
     @Req() req: Request & { user?: GoogleUser },
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<void> {
+    const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
+
     if (!req.user) {
-      throw new UnauthorizedException('Google authentication failed');
+      const errorUrl = `${frontendUrl}/auth/google-callback?error=${encodeURIComponent(
+        'Google authentication failed',
+      )}`;
+      if (req.res) {
+        (req.res as Response).redirect(errorUrl);
+      }
+      return;
     }
 
     const googleUser = req.user as GoogleUser;
     const result = await this.authFacade.googleLogin(googleUser);
+
     if (result?.accessToken && req.res) {
-      (req.res as Response).setHeader(
-        'Authorization',
-        `Bearer ${result.accessToken}`,
-      );
+      const successUrl = `${frontendUrl}/auth/google-callback?token=${encodeURIComponent(
+        result.accessToken,
+      )}`;
+      (req.res as Response).redirect(successUrl);
+    } else {
+      const errorUrl = `${frontendUrl}/auth/google-callback?error=${encodeURIComponent(
+        'Failed to generate access token',
+      )}`;
+      if (req.res) {
+        (req.res as Response).redirect(errorUrl);
+      }
     }
-    return result;
   }
 
   @Public()

@@ -74,26 +74,6 @@ export function getForwardHeaders(
 }
 
 /**
- * Forward response headers từ backend
- */
-export function forwardResponseHeaders(
-  event: H3Event,
-  responseHeaders: Headers,
-): void {
-  const excludedHeaders = [
-    'content-encoding',
-    'content-length',
-    'transfer-encoding',
-  ];
-
-  responseHeaders.forEach((value, key) => {
-    if (!excludedHeaders.includes(key.toLowerCase())) {
-      setHeader(event, key, value);
-    }
-  });
-}
-
-/**
  * Handle proxy error
  */
 export function handleProxyError(

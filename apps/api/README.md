@@ -77,8 +77,8 @@ src/
 - `GET /api/auth/me` - Lấy thông tin user hiện tại (protected)
 - `POST /api/auth/refresh` - Refresh access token
 - `POST /api/auth/logout` - Đăng xuất
-- `GET /api/auth/google` - Initiate Google OAuth flow
-- `GET /api/auth/google/callback` - Google OAuth callback
+- `GET /api/auth/google` - Initiate Google OAuth flow (qua proxy)
+- `GET /api/auth/google/callback` - Google OAuth callback (backend only, set cookie trực tiếp)
 - `POST /api/auth/reset-password/request` - Yêu cầu reset password
 - `POST /api/auth/reset-password` - Reset password với token
 
@@ -149,6 +149,7 @@ REDIS_URL=redis://localhost:6379
 GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_CLIENT_SECRET=your-client-secret
 GOOGLE_CALLBACK_URL=http://localhost:3001/api/auth/google/callback
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### Database Configuration

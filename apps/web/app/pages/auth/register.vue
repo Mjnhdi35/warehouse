@@ -3,6 +3,7 @@ import RegisterForm from '~/components/auth/RegisterForm.vue';
 
 definePageMeta({
   layout: 'auth',
+  ssr: false,
 });
 </script>
 

@@ -2,7 +2,6 @@ import {
   buildProxyUrl,
   getRequestBody,
   getForwardHeaders,
-  forwardResponseHeaders,
   handleProxyError,
 } from '../utils/proxy';
 
@@ -27,19 +26,62 @@ export default defineEventHandler(async (event) => {
     headers as Partial<Record<string, string | string[] | undefined>>,
   );
 
-  // Forward request đến backend
   try {
+    // Use manual redirect handling for OAuth flows
+    // Don't follow redirects automatically - let browser handle them
     const response = await $fetch(url, {
       method: method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
       headers: forwardHeaders,
-      body,
+      body: method === 'GET' ? undefined : body,
+      redirect: 'manual', // Manual redirect handling for OAuth
       onResponse({ response: res }) {
-        forwardResponseHeaders(event, res.headers);
+        // Forward response headers (except excluded ones)
+        res.headers.forEach((value, key) => {
+          const lowerKey = key.toLowerCase();
+          if (
+            ![
+              'content-encoding',
+              'content-length',
+              'transfer-encoding',
+            ].includes(lowerKey)
+          ) {
+            setHeader(event, key, value);
+          }
+        });
+
+        // Handle redirect responses (302, 301) for OAuth flows
+        // Passport will redirect to Google OAuth, forward to browser
+        if (res.status >= 300 && res.status < 400) {
+          const location = res.headers.get('location');
+          if (location) {
+            setResponseStatus(event, res.status);
+            setHeader(event, 'Location', location);
+          }
+        }
       },
     });
 
     return response;
   } catch (err: unknown) {
+    const error = err as {
+      response?: { status: number; headers?: Headers };
+      message?: string;
+    };
+
+    // Handle redirect responses in error case (for OAuth flows)
+    if (
+      error.response?.status &&
+      error.response.status >= 300 &&
+      error.response.status < 400
+    ) {
+      const location = error.response.headers?.get('location');
+      if (location) {
+        setResponseStatus(event, error.response.status);
+        setHeader(event, 'Location', location);
+        return; // Let browser handle the redirect
+      }
+    }
+
     return handleProxyError(event, err);
   }
 });

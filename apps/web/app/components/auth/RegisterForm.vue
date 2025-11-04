@@ -2,8 +2,8 @@
 import * as z from 'zod';
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
 
-const router = useRouter();
 const toast = useToast();
+const { setAccessToken } = useAuth();
 
 const schema = z
   .object({
@@ -73,26 +73,20 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   await handleSubmit(async (data) => {
     const { confirmPassword, ...registerData } = data;
 
-    const response = await useApi<{ accessToken: string }>('/auth/register', {
+    const response = (await useApi('/auth/register', {
       method: 'POST',
       body: registerData,
-    });
+    })) as { accessToken: string };
 
     if (response.accessToken) {
-      const token = useCookie('accessToken', {
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        secure: true,
-        sameSite: 'strict',
-      });
-      token.value = response.accessToken;
-
+      setAccessToken(response.accessToken);
       toast.add({
         title: 'Đăng ký thành công',
         color: 'success',
       });
 
-      setTimeout(async () => {
-        await router.push('/');
+      setTimeout(() => {
+        navigateTo('/');
       }, 2000);
     }
 

@@ -2,8 +2,7 @@
 import * as z from 'zod';
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
 
-const router = useRouter();
-const toast = useToast();
+const { handleAuthSuccess } = useAuth();
 
 const schema = z.object({
   email: z.email({ message: 'Email không hợp lệ' }),
@@ -30,13 +29,20 @@ const fields: AuthFormField[] = [
     icon: 'i-lucide-lock',
   },
 ];
+
+const handleGoogleLogin = () => {
+  if (import.meta.client) {
+    window.location.href = '/api/auth/google';
+  } else {
+    navigateTo('/api/auth/google', { external: true });
+  }
+};
+
 const providers = [
   {
     label: 'Google',
     icon: 'i-simple-icons-google',
-    onClick: () => {
-      toast.add({ title: 'Google', description: 'Login with Google' });
-    },
+    onClick: handleGoogleLogin,
   },
 ];
 
@@ -44,26 +50,13 @@ const { isSubmitting, error, handleSubmit } = useForm<Schema>();
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   await handleSubmit(async (data) => {
-    const response = await useApi<{ accessToken: string }>('/auth/login', {
+    const response = (await useApi('/auth/login', {
       method: 'POST',
       body: data,
-    });
+    })) as { accessToken: string };
 
-    // Store token
     if (response.accessToken) {
-      const token = useCookie('accessToken', {
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        secure: true,
-        sameSite: 'strict',
-      });
-      token.value = response.accessToken;
-
-      toast.add({
-        title: 'Đăng nhập thành công',
-        color: 'success',
-      });
-
-      await router.push('/');
+      handleAuthSuccess(response.accessToken, 'Đăng nhập thành công');
     }
 
     return response;
@@ -89,7 +82,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         variant="soft"
         :title="error"
         icon="i-lucide-alert-circle"
-        class="mb-4"
+        class="mb-2"
       />
     </template>
 
