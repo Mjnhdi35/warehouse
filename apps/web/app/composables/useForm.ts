@@ -28,7 +28,7 @@ export const useForm = <T extends Record<string, unknown>>() => {
     } catch (err: unknown) {
       const errorObj = err as { data?: { message?: string }; message?: string };
       error.value =
-        errorObj.data?.message || errorObj.message || 'Có lỗi xảy ra';
+        errorObj.data?.message || errorObj.message || 'An error occurred';
       throw err;
     } finally {
       isSubmitting.value = false;

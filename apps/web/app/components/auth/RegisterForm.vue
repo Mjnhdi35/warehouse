@@ -9,16 +9,16 @@ const schema = z
   .object({
     displayName: z
       .string()
-      .min(2, { message: 'Họ tên phải có ít nhất 2 ký tự' }),
-    email: z.email({ message: 'Email không hợp lệ' }),
+      .min(2, { message: 'Display name must be at least 2 characters' }),
+    email: z.email({ message: 'Invalid email address' }),
     phone: z.string().optional(),
     password: z
       .string()
-      .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' }),
+      .min(6, { message: 'Password must be at least 6 characters' }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Mật khẩu xác nhận không khớp',
+    message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
 
@@ -28,8 +28,8 @@ const fields: AuthFormField[] = [
   {
     name: 'displayName',
     type: 'text',
-    label: 'Họ tên',
-    placeholder: 'Nguyễn Văn A',
+    label: 'Display Name',
+    placeholder: 'John Doe',
     required: true,
     icon: 'i-lucide-user',
   },
@@ -44,15 +44,15 @@ const fields: AuthFormField[] = [
   {
     name: 'phone',
     type: 'text',
-    label: 'Số điện thoại',
-    placeholder: '0123456789',
+    label: 'Phone',
+    placeholder: '+1234567890',
     required: false,
     icon: 'i-lucide-phone',
   },
   {
     name: 'password',
     type: 'password',
-    label: 'Mật khẩu',
+    label: 'Password',
     placeholder: '••••••••',
     required: true,
     icon: 'i-lucide-lock',
@@ -60,7 +60,7 @@ const fields: AuthFormField[] = [
   {
     name: 'confirmPassword',
     type: 'password',
-    label: 'Xác nhận mật khẩu',
+    label: 'Confirm Password',
     placeholder: '••••••••',
     required: true,
     icon: 'i-lucide-lock',
@@ -81,7 +81,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     if (response.accessToken) {
       setAccessToken(response.accessToken);
       toast.add({
-        title: 'Đăng ký thành công',
+        title: 'Sign up successful',
         color: 'success',
       });
 
@@ -99,8 +99,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UAuthForm
     :schema="schema"
     :fields="fields"
-    title="Đăng ký"
-    description="Tạo tài khoản mới"
+    title="Sign Up"
+    description="Create a new account"
     icon="i-lucide-user-plus"
     :loading="isSubmitting"
     @submit="onSubmit"
@@ -110,8 +110,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         v-if="success"
         color="success"
         variant="soft"
-        title="Đăng ký thành công!"
-        description="Đang chuyển hướng..."
+        title="Sign up successful!"
+        description="Redirecting..."
         icon="i-lucide-check-circle"
         class="mb-4"
       />
@@ -127,12 +127,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
     <template #footer>
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Đã có tài khoản?
+        Already have an account?
         <ULink
           to="/auth/login"
           class="font-medium text-primary-600 dark:text-primary-400"
         >
-          Đăng nhập ngay
+          Sign in now
         </ULink>
       </p>
     </template>

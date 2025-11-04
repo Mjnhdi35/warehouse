@@ -49,7 +49,7 @@ export const useAuth = () => {
    */
   const handleAuthSuccess = (
     token: string,
-    message: string = 'Đăng nhập thành công',
+    message: string = 'Sign in successful',
     redirectPath: string = '/',
   ) => {
     setAccessToken(token);
@@ -66,11 +66,11 @@ export const useAuth = () => {
    * - Redirect to login
    */
   const handleAuthError = (
-    error: string = 'Có lỗi xảy ra khi đăng nhập',
+    error: string = 'An error occurred while signing in',
     redirectPath: string = '/auth/login',
   ) => {
     toast.add({
-      title: 'Đăng nhập thất bại',
+      title: 'Sign in failed',
       description: error,
       color: 'error',
     });
@@ -85,8 +85,15 @@ export const useAuth = () => {
    */
   const logout = (redirectPath: string = '/auth/login') => {
     removeAccessToken();
+    // Clear user info if useUser is available
+    try {
+      const { clearUser } = useUser();
+      clearUser();
+    } catch {
+      // useUser might not be available, ignore
+    }
     toast.add({
-      title: 'Đăng xuất thành công',
+      title: 'Sign out successful',
       color: 'success',
     });
     router.push(redirectPath);

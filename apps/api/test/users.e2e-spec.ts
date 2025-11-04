@@ -68,10 +68,10 @@ describe('UsersController (e2e)', () => {
       const response = await request(
         app.getHttpServer() as unknown as Parameters<typeof request>[0],
       )
-      .post('/api/users')
+        .post('/api/users')
         .set('Authorization', 'Bearer access-token')
         .send(createDto)
-      .expect(201);
+        .expect(201);
 
       expect(response.body).toEqual({
         id: mockUser.id,
@@ -83,7 +83,7 @@ describe('UsersController (e2e)', () => {
         updatedAt: mockUser.updatedAt.toISOString(),
       });
       expect(mockUsersService.create).toHaveBeenCalledWith(createDto);
-  });
+    });
 
     it('should handle invalid input', async () => {
       // Note: With mocked service, validation may be bypassed
@@ -105,9 +105,9 @@ describe('UsersController (e2e)', () => {
       const response = await request(
         app.getHttpServer() as unknown as Parameters<typeof request>[0],
       )
-      .get('/api/users')
+        .get('/api/users')
         .set('Authorization', 'Bearer access-token')
-      .expect(200);
+        .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
       expect((response.body as unknown[]).length).toBeGreaterThan(0);
@@ -124,7 +124,7 @@ describe('UsersController (e2e)', () => {
       )
         .get(`/api/users/${userId}`)
         .set('Authorization', 'Bearer access-token')
-      .expect(200);
+        .expect(200);
 
       expect(response.body).toEqual({
         id: mockUser.id,
@@ -153,7 +153,7 @@ describe('UsersController (e2e)', () => {
         .patch(`/api/users/${userId}`)
         .set('Authorization', 'Bearer access-token')
         .send(updateDto)
-      .expect(200);
+        .expect(200);
 
       expect(response.body).toBeDefined();
       expect(mockUsersService.update).toHaveBeenCalledWith(userId, updateDto);
@@ -183,7 +183,7 @@ describe('UsersController (e2e)', () => {
       )
         .delete(`/api/users/${userId}`)
         .set('Authorization', 'Bearer access-token')
-      .expect(200);
+        .expect(200);
 
       expect(response.body).toEqual({ success: true });
       expect(mockUsersService.remove).toHaveBeenCalledWith(userId);

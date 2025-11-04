@@ -20,7 +20,7 @@ const goToRegister = () => {
       icon="i-lucide-log-in"
       @click="goToLogin"
     >
-      Đăng nhập
+      Sign In
     </UButton>
 
     <!-- Register Button -->
@@ -29,7 +29,7 @@ const goToRegister = () => {
       icon="i-lucide-user-plus"
       @click="goToRegister"
     >
-      Đăng ký
+      Sign Up
     </UButton>
   </div>
 </template>

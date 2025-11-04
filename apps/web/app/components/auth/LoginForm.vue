@@ -5,8 +5,10 @@ import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
 const { handleAuthSuccess } = useAuth();
 
 const schema = z.object({
-  email: z.email({ message: 'Email không hợp lệ' }),
-  password: z.string().min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' }),
+  email: z.email({ message: 'Invalid email address' }),
+  password: z
+    .string()
+    .min(6, { message: 'Password must be at least 6 characters' }),
 });
 
 type Schema = z.output<typeof schema>;
@@ -23,7 +25,7 @@ const fields: AuthFormField[] = [
   {
     name: 'password',
     type: 'password',
-    label: 'Mật khẩu',
+    label: 'Password',
     placeholder: '••••••••',
     required: true,
     icon: 'i-lucide-lock',
@@ -56,7 +58,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     })) as { accessToken: string };
 
     if (response.accessToken) {
-      handleAuthSuccess(response.accessToken, 'Đăng nhập thành công');
+      handleAuthSuccess(response.accessToken, 'Sign in successful');
     }
 
     return response;
@@ -68,8 +70,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UAuthForm
     :schema="schema"
     :fields="fields"
-    title="Đăng nhập"
-    description="Đăng nhập vào tài khoản của bạn"
+    title="Sign In"
+    description="Sign in to your account"
     icon="i-lucide-lock"
     :loading="isSubmitting"
     :providers="providers"
@@ -88,12 +90,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
     <template #footer>
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Chưa có tài khoản?
+        Don't have an account?
         <ULink
           to="/auth/register"
           class="font-medium text-primary-600 dark:text-primary-400"
         >
-          Đăng ký ngay
+          Sign up now
         </ULink>
       </p>
     </template>

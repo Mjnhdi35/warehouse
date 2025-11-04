@@ -27,8 +27,8 @@ onMounted(async () => {
     } else {
       await navigateTo('/auth/login');
     }
-  } catch (err) {
-    handleAuthError('Có lỗi xảy ra');
+  } catch (error: any) {
+    handleAuthError('Có lỗi xảy ra', error);
   }
 });
 </script>
@@ -38,9 +38,9 @@ onMounted(async () => {
     <div class="text-center">
       <div
         class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"
-      ></div>
+      />
       <p class="mt-4 text-gray-600 dark:text-gray-400">
-        Đang xử lý đăng nhập với Google...
+        Processing Google sign in...
       </p>
     </div>
   </div>

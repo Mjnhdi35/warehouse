@@ -124,7 +124,7 @@ const userInitials = computed(() => {
             class="w-full justify-start"
             @click="handleLogout"
           >
-            Đăng xuất
+            Sign Out
           </UButton>
         </div>
       </div>

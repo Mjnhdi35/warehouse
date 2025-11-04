@@ -86,7 +86,7 @@ describe('AuthController (e2e)', () => {
       const response = await request(
         app.getHttpServer() as unknown as Parameters<typeof request>[0],
       )
-      .post('/api/auth/login')
+        .post('/api/auth/login')
         .send({ email: 'invalid-email' });
 
       // If validation works, should be 400, otherwise mocked service may accept it
@@ -107,7 +107,7 @@ describe('AuthController (e2e)', () => {
       )
         .post('/api/auth/register')
         .send(registerDto)
-      .expect(201);
+        .expect(201);
 
       expect(response.headers['authorization']).toBeDefined();
       expect(response.body).toEqual({
@@ -141,10 +141,10 @@ describe('AuthController (e2e)', () => {
       await request(
         app.getHttpServer() as unknown as Parameters<typeof request>[0],
       )
-      .post('/api/auth/refresh')
+        .post('/api/auth/refresh')
         .set('Authorization', 'Bearer refresh-token-1')
         .send({})
-      .expect(201);
+        .expect(201);
 
       expect(mockAuthFacade.refresh).toHaveBeenCalledWith('refresh-token-1');
     });
@@ -155,7 +155,7 @@ describe('AuthController (e2e)', () => {
       const response = await request(
         app.getHttpServer() as unknown as Parameters<typeof request>[0],
       )
-      .post('/api/auth/logout')
+        .post('/api/auth/logout')
         .set('Authorization', 'Bearer refresh-token-1')
         .send({ refreshToken: 'refresh-token-1' })
         .expect(201);
@@ -195,7 +195,7 @@ describe('AuthController (e2e)', () => {
       )
         .post('/api/auth/reset-password')
         .send(resetDto)
-      .expect(201);
+        .expect(201);
 
       expect(response.body).toEqual({ success: true });
       expect(mockAuthFacade.resetPassword).toHaveBeenCalledWith(

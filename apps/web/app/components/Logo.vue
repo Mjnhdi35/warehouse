@@ -85,17 +85,19 @@ const logoClasses = computed(() => [
     raw
   >
     <!-- Leading Icon/Image -->
-    <template v-if="leading && (icon || image)">
-      <Icon v-if="icon && !image" :name="icon" :class="iconSizeClasses[size]" />
-      <UAvatar
-        v-else-if="image"
-        :src="image"
-        :alt="alt"
-        size="sm"
-        :class="iconSizeClasses[size]"
-        class="object-contain"
-      />
-    </template>
+    <Icon
+      v-if="leading && icon && !image"
+      :name="icon"
+      :class="iconSizeClasses[size]"
+    />
+    <UAvatar
+      v-else-if="leading && image"
+      :src="image"
+      :alt="alt"
+      size="sm"
+      :class="iconSizeClasses[size]"
+      class="object-contain"
+    />
 
     <!-- Default Icon (only if no icon/image and no text) -->
     <Icon
@@ -108,16 +110,18 @@ const logoClasses = computed(() => [
     <span v-if="text" class="font-semibold">{{ text }}</span>
 
     <!-- Trailing Icon/Image -->
-    <template v-if="trailing && (icon || image)">
-      <Icon v-if="icon && !image" :name="icon" :class="iconSizeClasses[size]" />
-      <UAvatar
-        v-else-if="image"
-        :src="image"
-        :alt="alt"
-        size="sm"
-        :class="iconSizeClasses[size]"
-        class="object-contain"
-      />
-    </template>
+    <Icon
+      v-if="trailing && icon && !image"
+      :name="icon"
+      :class="iconSizeClasses[size]"
+    />
+    <UAvatar
+      v-else-if="trailing && image"
+      :src="image"
+      :alt="alt"
+      size="sm"
+      :class="iconSizeClasses[size]"
+      class="object-contain"
+    />
   </ULink>
 </template>
