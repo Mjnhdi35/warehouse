@@ -1,98 +1,377 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Warehouse API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API cho hệ thống Warehouse, được xây dựng với NestJS.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Tổng quan
 
-## Description
+API cung cấp RESTful endpoints cho:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Authentication & Authorization
+- User Management
+- Role Management
+- Permission Management
+- Health Check
 
-## Project setup
+## 🚀 Quick Start
+
+### Development
 
 ```bash
-$ yarn install
+# Install dependencies
+yarn install
+
+# Setup environment
+cp .env.example .env
+# Edit .env với thông tin database và Redis
+
+# Run migrations
+yarn migration:run
+
+# Start development server
+yarn dev
 ```
 
-## Compile and run the project
+Server sẽ chạy tại `http://localhost:3001`
+
+## 🏗️ Architecture
+
+### Module Structure
+
+API được tổ chức theo NestJS module pattern:
+
+```
+src/
+├── app.module.ts           # Root module
+├── main.ts                 # Bootstrap
+├── database/               # Database configuration
+├── redis/                  # Redis configuration
+├── common/                 # Shared utilities
+└── modules/                # Feature modules
+    ├── auth/              # Authentication
+    ├── users/             # User management
+    ├── roles/             # Role management
+    └── permissions/       # Permission management
+```
+
+### Key Features
+
+#### 1. Authentication Module
+
+- JWT-based authentication
+- Refresh token mechanism
+- Support cho Local và Google OAuth strategies
+- Token storage trong Redis
+
+**Endpoints:**
+
+- `POST /api/auth/register` - Đăng ký
+- `POST /api/auth/login` - Đăng nhập
+- `GET /api/auth/me` - Lấy thông tin user hiện tại
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/logout` - Đăng xuất
+
+#### 2. Users Module
+
+CRUD operations cho user management.
+
+**Endpoints:**
+
+- `GET /api/users` - List users
+- `GET /api/users/:id` - Get user by ID
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
+
+#### 3. Roles Module
+
+Quản lý roles và gán roles cho users.
+
+**Endpoints:**
+
+- `GET /api/roles` - List roles
+- `GET /api/roles/:id` - Get role by ID
+- `POST /api/roles` - Create role
+- `PUT /api/roles/:id` - Update role
+- `DELETE /api/roles/:id` - Delete role
+
+#### 4. Permissions Module
+
+Quản lý permissions và gán permissions cho roles.
+
+**Endpoints:**
+
+- `GET /api/permissions` - List permissions
+- `GET /api/permissions/:id` - Get permission by ID
+- `POST /api/permissions` - Create permission
+- `PUT /api/permissions/:id` - Update permission
+- `DELETE /api/permissions/:id` - Delete permission
+
+## 🔧 Configuration
+
+### Environment Variables
+
+```env
+# Server
+PORT=3001
+NODE_ENV=development
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/warehouse_db
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=your-refresh-secret
+JWT_REFRESH_EXPIRES_IN=7d
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:3001/api/auth/google/callback
+```
+
+### Database Configuration
+
+TypeORM được cấu hình trong `src/database/data-source.ts`:
+
+- **Connection Pool**:
+  - Production: min 2, max 10
+  - Development: min 1, max 5
+- **SSL**: Enabled trong production
+- **Logging**: Enabled trong development
+
+### Redis Configuration
+
+Redis được sử dụng cho:
+
+- Refresh token storage
+- Session caching
+- General caching
+
+## 🗄️ Database Migrations
+
+### Generate Migration
 
 ```bash
-# development
-$ yarn run start
+# Tự động generate từ entity changes
+yarn migration:generate src/database/migrations/MigrationName
 
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+# Tạo migration trống
+yarn migration:create src/database/migrations/MigrationName
 ```
 
-## Run tests
+### Run Migrations
 
 ```bash
-# unit tests
-$ yarn run test
+# Chạy tất cả pending migrations
+yarn migration:run
 
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+# Revert migration cuối cùng
+yarn migration:revert
 ```
 
-## Deployment
+### Migration Best Practices
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. Luôn tạo migration từ entity changes
+2. Review migration trước khi commit
+3. Test migrations trên development trước
+4. Backup database trước khi chạy migrations trên production
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🔐 Authentication & Authorization
+
+### JWT Strategy
+
+API sử dụng Passport JWT strategy để verify tokens:
+
+1. Client gửi `Authorization: Bearer <token>` header
+2. JwtAuthGuard verify token
+3. User information được inject vào `request.user`
+
+### Guards
+
+#### JwtAuthGuard
+
+Protect routes yêu cầu authentication. Được apply globally trong `app.module.ts`, có thể bypass bằng `@Public()` decorator.
+
+#### Usage
+
+```typescript
+// Protected route
+@Get('protected')
+@UseGuards(JwtAuthGuard)
+getProtectedData() {
+  return { message: 'This is protected' };
+}
+
+// Public route
+@Public()
+@Get('public')
+getPublicData() {
+  return { message: 'This is public' };
+}
+```
+
+### Refresh Token Flow
+
+1. Login/Register → Nhận access token (15 phút) và refresh token (7 ngày)
+2. Refresh token được lưu trong Redis
+3. Khi access token hết hạn → Gọi `/api/auth/refresh` với refresh token
+4. Nhận access token mới
+5. Logout → Invalidate refresh token trong Redis
+
+## 🧪 Testing
+
+### Unit Tests
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+# Run all tests
+yarn test
+
+# Watch mode
+yarn test:watch
+
+# Coverage
+yarn test:cov
+
+# Specific test file
+yarn test users.service.spec.ts
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### E2E Tests
 
-## Resources
+```bash
+# Run e2e tests
+yarn test:e2e
 
-Check out a few resources that may come in handy when working with NestJS:
+# Test specific file
+yarn test:e2e test/users.e2e-spec.ts
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Test Structure
 
-## Support
+```
+src/
+├── modules/
+│   ├── users/
+│   │   ├── users.service.spec.ts      # Unit tests
+│   │   └── users.controller.spec.ts   # Controller tests
+└── test/
+    ├── app.e2e-spec.ts                # App e2e tests
+    ├── auth.e2e-spec.ts               # Auth e2e tests
+    └── users.e2e-spec.ts              # Users e2e tests
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📦 Dependencies
 
-## Stay in touch
+### Core Dependencies
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- `@nestjs/common` - NestJS core
+- `@nestjs/core` - NestJS core
+- `@nestjs/config` - Configuration management
+- `@nestjs/typeorm` - TypeORM integration
+- `typeorm` - ORM
+- `pg` - PostgreSQL driver
+- `redis` - Redis client
+- `@nestjs/jwt` - JWT utilities
+- `@nestjs/passport` - Passport integration
+- `passport-jwt` - JWT strategy
+- `passport-local` - Local strategy
+- `bcrypt` - Password hashing
+- `class-validator` - Validation
+- `class-transformer` - Transformation
 
-## License
+### Dev Dependencies
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `@nestjs/cli` - NestJS CLI
+- `@nestjs/testing` - Testing utilities
+- `jest` - Testing framework
+- `ts-jest` - TypeScript Jest preset
+- `supertest` - HTTP assertions
+- `typescript` - TypeScript
+- `eslint` - Linting
+- `prettier` - Code formatting
+
+## 🚢 Deployment
+
+### Build
+
+```bash
+yarn build
+```
+
+Build output sẽ ở trong `dist/` folder.
+
+### Production Start
+
+```bash
+yarn start:prod
+```
+
+### Health Check
+
+API có health check endpoint tại `/api/health`:
+
+```bash
+curl http://localhost:3001/api/health
+```
+
+Response:
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+## 📝 Best Practices
+
+### Code Organization
+
+1. **Modules**: Mỗi feature có một module riêng
+2. **Services**: Business logic trong services
+3. **Controllers**: Chỉ handle HTTP requests/responses
+4. **DTOs**: Data Transfer Objects cho validation
+5. **Entities**: Database entities với TypeORM
+
+### Error Handling
+
+- Sử dụng NestJS built-in exceptions
+- Custom exceptions cho business logic errors
+- Validation errors tự động từ class-validator
+
+### Security
+
+- Passwords được hash với bcrypt
+- JWT tokens với secure secrets
+- Refresh tokens stored trong Redis
+- CORS configuration (nếu cần)
+- Input validation với class-validator
+
+## 🔍 Debugging
+
+### Debug Mode
+
+```bash
+yarn start:debug
+```
+
+### Logging
+
+- Development: Console logging enabled
+- Production: Disable sensitive logging
+
+### Common Debug Points
+
+1. Database queries: Check TypeORM logging
+2. Authentication: Check JWT token validity
+3. Redis: Check connection và token storage
+
+## 📚 Resources
+
+- [NestJS Documentation](https://docs.nestjs.com/)
+- [TypeORM Documentation](https://typeorm.io/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Redis Documentation](https://redis.io/docs/)
