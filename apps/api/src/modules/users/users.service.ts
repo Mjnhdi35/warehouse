@@ -2,19 +2,24 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dtos/user.dto';
-import { BcryptService } from '../../common';
+import {
+  PASSWORD_HASHER,
+  PasswordHasher,
+} from '../auth/interfaces/password-hasher.interface';
+import { generateRandomPassword, extractEmailUsername } from '../../common';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepo: Repository<UserEntity>,
-    private readonly bcryptService: BcryptService,
+    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
   ) {}
 
   async create(body: CreateUserDto) {
@@ -23,7 +28,7 @@ export class UsersService {
     if (existingUser) {
       throw new ConflictException('Duplicated!');
     }
-    const hashPass = await this.bcryptService.hashPassword(password);
+    const hashPass = await this.passwordHasher.hash(password);
     const newUser = this.usersRepo.create({
       email,
       password: hashPass,
@@ -65,7 +70,7 @@ export class UsersService {
       if (dup) throw new ConflictException('Duplicated!');
     }
     if (body.password) {
-      body.password = await this.bcryptService.hashPassword(body.password);
+      body.password = await this.passwordHasher.hash(body.password);
     }
     const merged = this.usersRepo.merge(user, body);
     const saved = await this.usersRepo.save(merged);
@@ -77,5 +82,24 @@ export class UsersService {
     if (!user) throw new NotFoundException('Not Found!');
     await this.usersRepo.remove(user);
     return { success: true };
+  }
+
+  async findOneByEmailOrCreate(email: string, data?: Partial<UserEntity>) {
+    try {
+      const user = await this.findOneByEmail(email);
+      return user;
+    } catch {
+      const randomPassword = generateRandomPassword();
+      const hashPass = await this.passwordHasher.hash(randomPassword);
+
+      const newUser = this.usersRepo.create({
+        email,
+        displayName: data?.displayName || extractEmailUsername(email),
+        avatar: data?.avatar,
+        phone: data?.phone,
+        password: hashPass,
+      });
+      return this.usersRepo.save(newUser);
+    }
   }
 }

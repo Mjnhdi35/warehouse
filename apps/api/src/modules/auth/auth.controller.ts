@@ -9,12 +9,22 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthFacade } from './auth.facade';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateUserDto } from '../users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
-import { AuthRequestUser, getBearerToken, Public } from '../../common';
+import {
+  RequestResetPasswordDto,
+  ResetPasswordDto,
+} from './dtos/reset-password.dto';
+import {
+  AuthRequestUser,
+  getBearerToken,
+  Public,
+  GoogleUser,
+} from '../../common';
 
 @Controller('auth')
 export class AuthController {
@@ -96,5 +106,47 @@ export class AuthController {
     const token = getBearerToken(auth) ?? body?.refreshToken ?? '';
     if (!token) throw new UnauthorizedException('Missing refresh token');
     return this.authFacade.logout(token);
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(
+    @Req() req: Request & { user?: GoogleUser },
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    if (!req.user) {
+      throw new UnauthorizedException('Google authentication failed');
+    }
+
+    const googleUser = req.user as GoogleUser;
+    const result = await this.authFacade.googleLogin(googleUser);
+    if (result?.accessToken && req.res) {
+      (req.res as Response).setHeader(
+        'Authorization',
+        `Bearer ${result.accessToken}`,
+      );
+    }
+    return result;
+  }
+
+  @Public()
+  @Post('reset-password/request')
+  async requestPasswordReset(
+    @Body() body: RequestResetPasswordDto,
+  ): Promise<{ token: string }> {
+    return this.authFacade.requestPasswordReset(body.email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+  ): Promise<{ success: true }> {
+    return this.authFacade.resetPassword(body.token, body.newPassword);
   }
 }

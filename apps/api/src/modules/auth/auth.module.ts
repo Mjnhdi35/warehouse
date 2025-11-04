@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { RedisModule } from '../../redis/redis.module';
 import { TokensService } from './tokens.service';
 import { RefreshTokenStore } from './refresh-token.store';
@@ -35,6 +36,7 @@ import { AuthFacade } from './auth.facade';
     AuthService,
     AuthFacade,
     JwtStrategy,
+    GoogleStrategy,
     TokensService,
     { provide: PASSWORD_HASHER, useClass: BcryptService },
     { provide: TOKEN_STORE, useClass: RefreshTokenStore },

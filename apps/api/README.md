@@ -57,28 +57,47 @@ src/
 
 #### 1. Authentication Module
 
-- JWT-based authentication
-- Refresh token mechanism
-- Support cho Local và Google OAuth strategies
+- JWT-based authentication với refresh token mechanism
+- Support cho Local và Google OAuth 2.0 strategies
 - Token storage trong Redis
+- Password reset functionality
+- Facade pattern với Dependency Injection
+
+**Architecture:**
+
+- Controller → Facade → Service pattern
+- Business logic separation (AuthService)
+- Orchestration layer (AuthFacade)
+- Interface-based password hashing
 
 **Endpoints:**
 
-- `POST /api/auth/register` - Đăng ký
+- `POST /api/auth/register` - Đăng ký user mới
 - `POST /api/auth/login` - Đăng nhập
-- `GET /api/auth/me` - Lấy thông tin user hiện tại
+- `GET /api/auth/me` - Lấy thông tin user hiện tại (protected)
 - `POST /api/auth/refresh` - Refresh access token
 - `POST /api/auth/logout` - Đăng xuất
+- `GET /api/auth/google` - Initiate Google OAuth flow
+- `GET /api/auth/google/callback` - Google OAuth callback
+- `POST /api/auth/reset-password/request` - Yêu cầu reset password
+- `POST /api/auth/reset-password` - Reset password với token
 
 #### 2. Users Module
 
 CRUD operations cho user management.
 
+**Architecture:**
+
+- Simple module structure (Controller → Service)
+- Uses `PasswordHasher` interface (consistent with Auth module)
+- TypeORM repository pattern
+
 **Endpoints:**
 
-- `GET /api/users` - List users
+- `GET /api/users` - List all users
 - `GET /api/users/:id` - Get user by ID
-- `PUT /api/users/:id` - Update user
+- `POST /api/users` - Create new user
+- `PATCH /api/users/:id` - Update user
 - `DELETE /api/users/:id` - Delete user
 
 #### 3. Roles Module
