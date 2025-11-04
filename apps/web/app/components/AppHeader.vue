@@ -75,6 +75,9 @@ const navigationItems = computed<NavigationMenuItem[]>(() => {
 
     <!-- Right Side Actions -->
     <template #right>
+      <!-- User Menu -->
+      <slot name="user-menu" />
+
       <!-- Color Mode Button -->
       <ColorModeButton v-if="showColorMode" />
 
