@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'AppLogo',
+});
+
 interface Props {
   /**
    * Text hiển thị cho logo
@@ -45,6 +49,9 @@ const props = withDefaults(defineProps<Props>(), {
   leading: true,
   trailing: false,
   alt: 'Warehouse Logo',
+  icon: undefined,
+  image: undefined,
+  class: undefined,
 });
 
 const sizeClasses = {
@@ -86,7 +93,7 @@ const logoClasses = computed(() => [
         :alt="alt"
         :class="iconSizeClasses[size]"
         class="object-contain"
-      />
+      >
     </template>
 
     <!-- Default Icon (nếu không có icon/image và không có text) -->
@@ -108,7 +115,7 @@ const logoClasses = computed(() => [
         :alt="alt"
         :class="iconSizeClasses[size]"
         class="object-contain"
-      />
+      >
     </template>
   </ULink>
 </template>

@@ -34,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
   logoTo: '/',
   showColorMode: true,
   logoImage: '/assets/images/plant1.svg',
+  logoIcon: undefined,
 });
 
 const route = useRoute();

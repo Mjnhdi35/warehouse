@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   items: () => [],
   copyright: 'Warehouse',
   showYear: true,
+  copyrightText: undefined,
 });
 
 const currentYear = new Date().getFullYear();

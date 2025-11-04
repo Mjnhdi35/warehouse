@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from '../users/entities/user.entity';
@@ -19,8 +19,6 @@ export class TokensService {
     private readonly configService: ConfigService,
     @Inject(TOKEN_STORE) private readonly refreshStore: TokenStore,
   ) {}
-
-  private readonly logger = new Logger(TokensService.name);
 
   private async signAccessToken(user: UserEntity): Promise<string> {
     const payload = buildPayload(user);
@@ -46,7 +44,6 @@ export class TokensService {
       this.signAccessToken(user),
       this.signRefreshToken(user),
     ]);
-    this.logger.log(`Issued tokens for user=${user.id}`);
     return { accessToken, refreshToken };
   }
 
@@ -60,7 +57,7 @@ export class TokensService {
 
     await this.refreshStore.blacklist(refreshToken, payload.exp, payload.sub);
     await this.refreshStore.revoke(payload.sub, refreshToken);
-    this.logger.log(`Rotated refresh for user=${payload.sub}`);
+
     return payload;
   }
 
@@ -70,7 +67,7 @@ export class TokensService {
     const exp = extractExp(decoded);
     if (sub) await this.refreshStore.revoke(sub, refreshToken);
     await this.refreshStore.blacklist(refreshToken, exp, sub ?? 'unknown');
-    this.logger.log(`Revoked refresh token for user=${sub ?? 'unknown'}`);
+
     return { success: true } as const;
   }
 
@@ -83,6 +80,4 @@ export class TokensService {
         throw new UnauthorizedException('Invalid refresh token');
       });
   }
-
-  // using shared extractExp/extractSub from common utils
 }

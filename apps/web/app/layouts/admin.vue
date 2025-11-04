@@ -1,7 +1,7 @@
 <template>
   <div>
     admin layout
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 
