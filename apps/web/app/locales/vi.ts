@@ -1,10 +1,14 @@
 import type { Locale, Messages } from '@nuxt/ui';
+import { en } from '@nuxt/ui/locale';
 
-export default defineLocale({
+export default extendLocale(en, {
   name: 'Tiếng Việt',
   code: 'vi',
   dir: 'ltr',
   messages: {
+    ...en.messages,
+    // Custom messages
+    // @ts-expect-error - Custom messages not in Messages type
     auth: {
       signIn: 'Đăng nhập',
       signUp: 'Đăng ký',

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { isAuthenticated } = useAuth();
+const { t } = useI18n();
 const router = useRouter();
 
 const goToLogin = () => {
@@ -20,17 +21,12 @@ const goToRegister = () => {
       icon="i-lucide-log-in"
       @click="goToLogin"
     >
-      Sign In
+      {{ t('auth.signIn') }}
     </UButton>
 
     <!-- Register Button -->
-    <UButton
-      color="primary"
-      icon="i-lucide-user-plus"
-      @click="goToRegister"
-    >
-      Sign Up
+    <UButton color="primary" icon="i-lucide-user-plus" @click="goToRegister">
+      {{ t('auth.signUp') }}
     </UButton>
   </div>
 </template>
-

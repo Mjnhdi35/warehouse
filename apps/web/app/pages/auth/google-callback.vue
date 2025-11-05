@@ -6,6 +6,7 @@ definePageMeta({
 
 const route = useRoute();
 const { setAccessToken, handleAuthSuccess, handleAuthError } = useAuth();
+const { t } = useI18n();
 
 onMounted(async () => {
   try {
@@ -13,7 +14,7 @@ onMounted(async () => {
     const error = route.query.error as string | undefined;
 
     if (error) {
-      handleAuthError(error || 'Có lỗi xảy ra khi đăng nhập với Google');
+      handleAuthError(error || t('auth.signInWithGoogleError'));
       return;
     }
 
@@ -23,12 +24,12 @@ onMounted(async () => {
       await navigateTo('/auth/google-callback?success=true', {
         replace: true,
       });
-      handleAuthSuccess(token, 'Đăng nhập với Google thành công!');
+      handleAuthSuccess(token);
     } else {
       await navigateTo('/auth/login');
     }
   } catch (error: any) {
-    handleAuthError('Có lỗi xảy ra', error);
+    handleAuthError(t('auth.anErrorOccurred'));
   }
 });
 </script>
@@ -40,7 +41,7 @@ onMounted(async () => {
         class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"
       />
       <p class="mt-4 text-gray-600 dark:text-gray-400">
-        Processing Google sign in...
+        {{ t('auth.processingGoogleSignIn') }}
       </p>
     </div>
   </div>

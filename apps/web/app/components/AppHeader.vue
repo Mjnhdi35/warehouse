@@ -30,16 +30,19 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   items: () => [],
-  logoText: 'Warehouse',
+  logoText: 'Fresh Shop',
   logoTo: '/',
   showColorMode: true,
   logoImage: '/assets/images/plant1.svg',
-  logoIcon: undefined,
 });
 
 const route = useRoute();
 
 const navigationItems = computed<NavigationMenuItem[]>(() => {
+  if (!import.meta.client) {
+    return props.items;
+  }
+
   return props.items.map((item) => {
     let isActive = false;
     if (item.active !== undefined) {
@@ -63,7 +66,7 @@ const navigationItems = computed<NavigationMenuItem[]>(() => {
         :icon="logoIcon"
         :image="logoImage"
         :to="logoTo"
-        size="md"
+        size="lg"
       />
     </template>
 

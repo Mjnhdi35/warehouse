@@ -1,30 +1,37 @@
 /**
+ * User info interface
+ */
+export interface UserInfo {
+  userId?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+  avatar?: string;
+}
+
+/**
  * Composable để quản lý user info và authentication state
  */
 export const useUser = () => {
   const { isAuthenticated, getAccessToken } = useAuth();
 
-  // User state
-  const user = useState<{
-    avatar?: string;
-    displayName?: string;
-    email?: string;
-  } | null>('user', () => null);
-
-  const loading = ref(false);
+  // User state - shared across components
+  const user = useState<UserInfo | null>('user', () => null);
+  const loading = useState<boolean>('user-loading', () => false);
 
   /**
    * Fetch user info from API
    */
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = async (force = false) => {
     if (!isAuthenticated.value) {
       user.value = null;
       loading.value = false;
       return;
     }
 
-    // Don't fetch if already have user data
-    if (user.value) {
+    // Don't fetch if already have user data (unless forced)
+    if (user.value && !force) {
       return;
     }
 
@@ -32,27 +39,20 @@ export const useUser = () => {
     try {
       const token = getAccessToken();
       if (token.value) {
-        const response = (await useApi('/auth/me', {
+        const response = await useApi<UserInfo>('/auth/me', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
-        })) as {
-          userId?: string;
-          email?: string;
-          firstName?: string;
-          lastName?: string;
-          displayName?: string;
-          avatar?: string;
-        };
+        });
 
         user.value = {
-          email: response.email,
+          ...response,
           displayName:
             response.displayName ||
             `${response.firstName || ''} ${response.lastName || ''}`.trim() ||
-            response.email,
-          avatar: response.avatar,
+            response.email ||
+            '',
         };
       }
     } catch (error) {
@@ -72,13 +72,17 @@ export const useUser = () => {
   };
 
   // Watch authentication state and fetch user info
-  watch(isAuthenticated, (authenticated) => {
-    if (authenticated) {
-      fetchUserInfo();
-    } else {
-      clearUser();
-    }
-  });
+  watch(
+    isAuthenticated,
+    (authenticated) => {
+      if (authenticated) {
+        fetchUserInfo();
+      } else {
+        clearUser();
+      }
+    },
+    { immediate: true },
+  );
 
   // Fetch on client mount if authenticated
   if (import.meta.client) {

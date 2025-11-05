@@ -1,9 +1,11 @@
 import type { FormSubmitEvent } from '@nuxt/ui';
+import type { ApiError } from './useApi';
 
 /**
  * Composable để quản lý form state và validation
  */
 export const useForm = <T extends Record<string, unknown>>() => {
+  const { t } = useI18n();
   const isSubmitting = ref(false);
   const error = ref<string | null>(null);
   const success = ref(false);
@@ -26,9 +28,13 @@ export const useForm = <T extends Record<string, unknown>>() => {
       success.value = true;
       return result;
     } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      error.value =
-        errorObj.data?.message || errorObj.message || 'An error occurred';
+      // Handle ApiError from useApi
+      if (err && typeof err === 'object' && 'message' in err) {
+        const apiError = err as ApiError;
+        error.value = apiError.message || t('common.anErrorOccurred');
+      } else {
+        error.value = t('common.anErrorOccurred');
+      }
       throw err;
     } finally {
       isSubmitting.value = false;

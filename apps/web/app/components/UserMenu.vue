@@ -35,22 +35,23 @@ const props = withDefaults(defineProps<Props>(), {
 const isOpen = ref(false);
 
 const { logout } = useAuth();
+const { t } = useI18n();
 
-const defaultItems: NavigationMenuItem[] = [
+const defaultItems = computed<NavigationMenuItem[]>(() => [
   {
-    label: 'Profile',
+    label: t('user.profile'),
     icon: 'i-lucide-user',
     to: '/profile',
   },
   {
-    label: 'Settings',
+    label: t('user.settings'),
     icon: 'i-lucide-settings',
     to: '/settings',
   },
-];
+]);
 
 const menuItems = computed(() => {
-  return props.items.length > 0 ? props.items : defaultItems;
+  return props.items.length > 0 ? props.items : defaultItems.value;
 });
 
 const handleLogout = () => {
@@ -87,7 +88,7 @@ const userInitials = computed(() => {
       v-else
       variant="ghost"
       color="neutral"
-      :aria-label="displayName || 'User menu'"
+      :aria-label="displayName || t('user.userMenu')"
       @click="isOpen = !isOpen"
     >
       <UAvatar
@@ -124,7 +125,7 @@ const userInitials = computed(() => {
             class="w-full justify-start"
             @click="handleLogout"
           >
-            Sign Out
+            {{ t('auth.signOut') }}
           </UButton>
         </div>
       </div>

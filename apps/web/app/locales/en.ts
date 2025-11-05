@@ -44,7 +44,6 @@ export default extendLocale(en, {
       settings: 'Settings',
       userMenu: 'User menu',
     },
-
     common: {
       home: 'Home',
       loading: 'Loading...',

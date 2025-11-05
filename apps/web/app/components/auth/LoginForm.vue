@@ -3,21 +3,23 @@ import * as z from 'zod';
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
 
 const { handleAuthSuccess } = useAuth();
+const { t } = useI18n();
 
-const schema = z.object({
-  email: z.email({ message: 'Invalid email address' }),
-  password: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters' }),
-});
+const createSchema = () =>
+  z.object({
+    email: z.email({ message: t('auth.invalidEmail') }),
+    password: z.string().min(6, { message: t('auth.passwordMinLength') }),
+  });
 
-type Schema = z.output<typeof schema>;
+type Schema = z.infer<ReturnType<typeof createSchema>>;
 
-const fields: AuthFormField[] = [
+const schema = computed(createSchema);
+
+const fields = computed<AuthFormField[]>(() => [
   {
     name: 'email',
     type: 'email',
-    label: 'Email',
+    label: t('auth.email'),
     placeholder: 'your@email.com',
     required: true,
     icon: 'i-lucide-mail',
@@ -25,12 +27,12 @@ const fields: AuthFormField[] = [
   {
     name: 'password',
     type: 'password',
-    label: 'Password',
+    label: t('auth.password'),
     placeholder: '••••••••',
     required: true,
     icon: 'i-lucide-lock',
   },
-];
+]);
 
 const handleGoogleLogin = () => {
   if (import.meta.client) {
@@ -58,7 +60,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     })) as { accessToken: string };
 
     if (response.accessToken) {
-      handleAuthSuccess(response.accessToken, 'Sign in successful');
+      handleAuthSuccess(response.accessToken);
     }
 
     return response;
@@ -70,8 +72,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UAuthForm
     :schema="schema"
     :fields="fields"
-    title="Sign In"
-    description="Sign in to your account"
+    :title="t('auth.signIn')"
+    :description="t('auth.signInToAccount')"
     icon="i-lucide-lock"
     :loading="isSubmitting"
     :providers="providers"
@@ -90,12 +92,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
     <template #footer>
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Don't have an account?
+        {{ t('auth.dontHaveAccount') }}
         <ULink
           to="/auth/register"
           class="font-medium text-primary-600 dark:text-primary-400"
         >
-          Sign up now
+          {{ t('auth.signUpNow') }}
         </ULink>
       </p>
     </template>

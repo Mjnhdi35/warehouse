@@ -90,18 +90,17 @@ const logoClasses = computed(() => [
       :name="icon"
       :class="iconSizeClasses[size]"
     />
-    <UAvatar
+    <img
       v-else-if="leading && image"
       :src="image"
       :alt="alt"
-      size="sm"
       :class="iconSizeClasses[size]"
       class="object-contain"
     />
 
     <!-- Default Icon (only if no icon/image and no text) -->
     <Icon
-      v-if="!icon && !image && !text"
+      v-else-if="!leading && !trailing && !icon && !image && !text"
       name="i-lucide-warehouse"
       :class="iconSizeClasses[size]"
     />
@@ -115,11 +114,10 @@ const logoClasses = computed(() => [
       :name="icon"
       :class="iconSizeClasses[size]"
     />
-    <UAvatar
+    <img
       v-else-if="trailing && image"
       :src="image"
       :alt="alt"
-      size="sm"
       :class="iconSizeClasses[size]"
       class="object-contain"
     />

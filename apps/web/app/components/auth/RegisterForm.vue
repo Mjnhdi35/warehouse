@@ -4,31 +4,36 @@ import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui';
 
 const toast = useToast();
 const { setAccessToken } = useAuth();
+const { t } = useI18n();
 
-const schema = z
-  .object({
-    displayName: z
-      .string()
-      .min(2, { message: 'Display name must be at least 2 characters' }),
-    email: z.email({ message: 'Invalid email address' }),
-    phone: z.string().optional(),
-    password: z
-      .string()
-      .min(6, { message: 'Password must be at least 6 characters' }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+// Schema builder function for type inference
+const createSchema = () =>
+  z
+    .object({
+      displayName: z
+        .string()
+        .min(2, { message: t('auth.displayNameMinLength') }),
+      email: z.email({ message: t('auth.invalidEmail') }),
+      phone: z.string().optional(),
+      password: z.string().min(6, { message: t('auth.passwordMinLength') }),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('auth.passwordsDoNotMatch'),
+      path: ['confirmPassword'],
+    });
 
-type Schema = z.output<typeof schema>;
+// Extract type from schema builder
+type Schema = z.infer<ReturnType<typeof createSchema>>;
 
-const fields: AuthFormField[] = [
+// Schema needs to be computed for reactivity with i18n
+const schema = computed(createSchema);
+
+const fields = computed<AuthFormField[]>(() => [
   {
     name: 'displayName',
     type: 'text',
-    label: 'Display Name',
+    label: t('auth.displayName'),
     placeholder: 'John Doe',
     required: true,
     icon: 'i-lucide-user',
@@ -36,7 +41,7 @@ const fields: AuthFormField[] = [
   {
     name: 'email',
     type: 'email',
-    label: 'Email',
+    label: t('auth.email'),
     placeholder: 'your@email.com',
     required: true,
     icon: 'i-lucide-mail',
@@ -44,7 +49,7 @@ const fields: AuthFormField[] = [
   {
     name: 'phone',
     type: 'text',
-    label: 'Phone',
+    label: t('auth.phone'),
     placeholder: '+1234567890',
     required: false,
     icon: 'i-lucide-phone',
@@ -52,7 +57,7 @@ const fields: AuthFormField[] = [
   {
     name: 'password',
     type: 'password',
-    label: 'Password',
+    label: t('auth.password'),
     placeholder: '••••••••',
     required: true,
     icon: 'i-lucide-lock',
@@ -60,12 +65,12 @@ const fields: AuthFormField[] = [
   {
     name: 'confirmPassword',
     type: 'password',
-    label: 'Confirm Password',
+    label: t('auth.confirmPassword'),
     placeholder: '••••••••',
     required: true,
     icon: 'i-lucide-lock',
   },
-];
+]);
 
 const { isSubmitting, error, success, handleSubmit } = useForm<Schema>();
 
@@ -81,7 +86,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     if (response.accessToken) {
       setAccessToken(response.accessToken);
       toast.add({
-        title: 'Sign up successful',
+        title: t('auth.signUpSuccess'),
         color: 'success',
       });
 
@@ -99,8 +104,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UAuthForm
     :schema="schema"
     :fields="fields"
-    title="Sign Up"
-    description="Create a new account"
+    :title="t('auth.signUp')"
+    :description="t('auth.createNewAccount')"
     icon="i-lucide-user-plus"
     :loading="isSubmitting"
     @submit="onSubmit"
@@ -110,8 +115,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         v-if="success"
         color="success"
         variant="soft"
-        title="Sign up successful!"
-        description="Redirecting..."
+        :title="t('auth.signUpSuccess')"
+        :description="t('auth.redirecting')"
         icon="i-lucide-check-circle"
         class="mb-4"
       />
@@ -127,12 +132,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
     <template #footer>
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Already have an account?
+        {{ t('auth.alreadyHaveAccount') }}
         <ULink
           to="/auth/login"
           class="font-medium text-primary-600 dark:text-primary-400"
         >
-          Sign in now
+          {{ t('auth.signInNow') }}
         </ULink>
       </p>
     </template>

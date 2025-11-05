@@ -4,41 +4,45 @@
 export const useAuth = () => {
   const router = useRouter();
   const toast = useToast();
+  const { t } = useI18n();
+
+  /**
+   * Access token cookie - shared state
+   */
+  const accessTokenCookie = useCookie<string | null>('accessToken', {
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    secure: true,
+    sameSite: 'strict',
+    default: () => null,
+  });
 
   /**
    * Get access token cookie
    */
   const getAccessToken = () => {
-    return useCookie('accessToken', {
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      secure: true,
-      sameSite: 'strict',
-    });
+    return accessTokenCookie;
   };
 
   /**
    * Set access token cookie
    */
   const setAccessToken = (token: string) => {
-    const tokenCookie = getAccessToken();
-    tokenCookie.value = token;
-    return tokenCookie;
+    accessTokenCookie.value = token;
+    return accessTokenCookie;
   };
 
   /**
    * Remove access token cookie (logout)
    */
   const removeAccessToken = () => {
-    const tokenCookie = getAccessToken();
-    tokenCookie.value = null;
+    accessTokenCookie.value = null;
   };
 
   /**
    * Check if user is authenticated
    */
   const isAuthenticated = computed(() => {
-    const token = getAccessToken();
-    return !!token.value;
+    return !!accessTokenCookie.value;
   });
 
   /**
@@ -49,12 +53,12 @@ export const useAuth = () => {
    */
   const handleAuthSuccess = (
     token: string,
-    message: string = 'Sign in successful',
+    message?: string,
     redirectPath: string = '/',
   ) => {
     setAccessToken(token);
     toast.add({
-      title: message,
+      title: message || t('auth.signInSuccess'),
       color: 'success',
     });
     router.push(redirectPath);
@@ -66,12 +70,12 @@ export const useAuth = () => {
    * - Redirect to login
    */
   const handleAuthError = (
-    error: string = 'An error occurred while signing in',
+    error?: string,
     redirectPath: string = '/auth/login',
   ) => {
     toast.add({
-      title: 'Sign in failed',
-      description: error,
+      title: t('auth.signInFailed'),
+      description: error || t('auth.anErrorOccurredWhileSigningIn'),
       color: 'error',
     });
     router.push(redirectPath);
@@ -93,7 +97,7 @@ export const useAuth = () => {
       // useUser might not be available, ignore
     }
     toast.add({
-      title: 'Sign out successful',
+      title: t('auth.signOutSuccess'),
       color: 'success',
     });
     router.push(redirectPath);
