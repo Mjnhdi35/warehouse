@@ -10,7 +10,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
-    // During test runs, bypass authentication to simplify E2E testing
     if (process.env.NODE_ENV === 'test') {
       return true;
     }

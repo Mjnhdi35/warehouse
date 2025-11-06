@@ -2,11 +2,24 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
-  ssr: false,
+
+  ssr: true,
 
   typescript: {
     typeCheck: true,
   },
 
-  modules: ['@nuxt/eslint'],
+  css: ['~/assets/css/main.css'],
+
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/ui',
+    '@nuxt/icon',
+    '@nuxt/fonts',
+    '@nuxt/image',
+  ],
+
+  runtimeConfig: {
+    apiBaseUrl: process.env.API_BASE_URL!,
+  },
 });

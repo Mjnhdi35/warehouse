@@ -9,16 +9,30 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 import { AuthFacade } from './auth.facade';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateUserDto } from '../users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
-import { AuthRequestUser, getBearerToken, Public } from '../../common';
+import {
+  RequestResetPasswordDto,
+  ResetPasswordDto,
+} from './dtos/reset-password.dto';
+import {
+  AuthRequestUser,
+  getBearerToken,
+  Public,
+  GoogleUser,
+} from '../../common';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authFacade: AuthFacade) {}
+  constructor(
+    private readonly authFacade: AuthFacade,
+    private readonly configService: ConfigService,
+  ) {}
 
   private isAuthRequestUser(u: unknown): u is AuthRequestUser {
     return (
@@ -96,5 +110,62 @@ export class AuthController {
     const token = getBearerToken(auth) ?? body?.refreshToken ?? '';
     if (!token) throw new UnauthorizedException('Missing refresh token');
     return this.authFacade.logout(token);
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(
+    @Req() req: Request & { user?: GoogleUser },
+  ): Promise<void> {
+    const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
+
+    if (!req.user) {
+      const errorUrl = `${frontendUrl}/auth/google-callback?error=${encodeURIComponent(
+        'Google authentication failed',
+      )}`;
+      if (req.res) {
+        (req.res as Response).redirect(errorUrl);
+      }
+      return;
+    }
+
+    const googleUser = req.user as GoogleUser;
+    const result = await this.authFacade.googleLogin(googleUser);
+
+    if (result?.accessToken && req.res) {
+      const successUrl = `${frontendUrl}/auth/google-callback?token=${encodeURIComponent(
+        result.accessToken,
+      )}`;
+      (req.res as Response).redirect(successUrl);
+    } else {
+      const errorUrl = `${frontendUrl}/auth/google-callback?error=${encodeURIComponent(
+        'Failed to generate access token',
+      )}`;
+      if (req.res) {
+        (req.res as Response).redirect(errorUrl);
+      }
+    }
+  }
+
+  @Public()
+  @Post('reset-password/request')
+  async requestPasswordReset(
+    @Body() body: RequestResetPasswordDto,
+  ): Promise<{ token: string }> {
+    return this.authFacade.requestPasswordReset(body.email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+  ): Promise<{ success: true }> {
+    return this.authFacade.resetPassword(body.token, body.newPassword);
   }
 }

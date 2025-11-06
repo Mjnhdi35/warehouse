@@ -1,9 +1,10 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { TokensService } from './tokens.service';
 import { CreateUserDto } from '../users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { AuthService } from './auth.service';
+import { GoogleUser } from '../../common';
 
 @Injectable()
 export class AuthFacade {
@@ -19,13 +20,6 @@ export class AuthFacade {
   }
 
   async register(body: CreateUserDto) {
-    const exists = await this.usersService
-      .findOneByEmail(body.email)
-      .then(() => true)
-      .catch(() => false);
-    if (exists) {
-      throw new ConflictException('Email already in use');
-    }
     const newUser = await this.usersService.create(body);
     return this.tokensService.issueFor(newUser);
   }
@@ -40,5 +34,22 @@ export class AuthFacade {
 
   async logout(token: string) {
     return this.tokensService.revoke(token);
+  }
+
+  async googleLogin(googleUser: GoogleUser) {
+    const user = await this.authService.validateGoogleUser(googleUser);
+    return this.tokensService.issueFor(user);
+  }
+
+  async requestPasswordReset(email: string) {
+    return this.authService.requestPasswordReset(email);
+  }
+
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<{ success: true }> {
+    await this.authService.resetPassword(token, newPassword);
+    return { success: true as const };
   }
 }
